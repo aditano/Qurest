@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Symptom Checker</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --primary:#2563eb;--primary-dark:#1d4ed8;--primary-light:#eff6ff;
+      --success:#10b981;--warning:#f59e0b;--danger:#ef4444;
+      --text:#1e293b;--muted:#64748b;--border:#e2e8f0;
+      --bg:#f1f5f9;--white:#ffffff;
+      --shadow:0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -1px rgba(0,0,0,.06);
+    }
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+    header{background:var(--white);border-bottom:1px solid var(--border);padding:1rem 1.5rem;display:flex;align-items:center;gap:.75rem;position:sticky;top:0;z-index:10}
+    .logo{width:38px;height:38px;background:linear-gradient(135deg,#2563eb,#7c3aed);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.1rem;flex-shrink:0}
+    .header-text h1{font-size:1.1rem;font-weight:700}
+    .header-text p{font-size:.75rem;color:var(--muted)}
+    .container{max-width:680px;margin:0 auto;padding:2rem 1.25rem}
+    /* DISCLAIMER */
+    .disclaimer{background:#fef3c7;border:1px solid #fde68a;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.75rem;display:flex;gap:.75rem;font-size:.8125rem;color:#92400e;line-height:1.5}
+    .disclaimer .di{font-size:1rem;flex-shrink:0;margin-top:1px}
+    /* PROGRESS */
+    .progress-wrap{margin-bottom:1.5rem}
+    .progress-meta{display:flex;justify-content:space-between;font-size:.8125rem;margin-bottom:.4rem;color:var(--muted)}
+    .progress-meta span:last-child{color:var(--primary);font-weight:600}
+    .progress-bar{height:6px;background:var(--border);border-radius:99px;overflow:hidden}
+    .progress-fill{height:100%;background:var(--primary);border-radius:99px;transition:width .4s ease}
+    /* CARD */
+    .card{background:var(--white);border-radius:16px;padding:1.75rem;box-shadow:var(--shadow);border:1px solid var(--border)}
+    .q-label{font-size:.7rem;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.6rem}
+    .q-text{font-size:1.2rem;font-weight:700;line-height:1.4;margin-bottom:1.5rem}
+    .q-sub{font-size:.875rem;color:var(--muted);margin-top:.35rem;font-weight:400}
+    .options{display:flex;flex-direction:column;gap:.625rem}
+    .opt{display:flex;align-items:center;gap:.875rem;padding:.875rem 1rem;background:var(--bg);border:2px solid var(--border);border-radius:12px;cursor:pointer;text-align:left;width:100%;font-size:.9rem;color:var(--text);line-height:1.4;transition:border-color .15s,background .15s,color .15s}
+    .opt:hover{border-color:var(--primary);background:var(--primary-light);color:var(--primary)}
+    .opt.selected{border-color:var(--primary);background:var(--primary-light);color:var(--primary)}
+    .opt-icon{font-size:1.2rem;flex-shrink:0;width:28px;text-align:center}
+    .opt-letter{display:flex;align-items:center;justify-content:center;width:26px;height:26px;background:var(--border);border-radius:7px;font-size:.7rem;font-weight:700;flex-shrink:0;transition:background .15s,color .15s}
+    .opt:hover .opt-letter,.opt.selected .opt-letter{background:var(--primary);color:#fff}
+    /* NAV */
+    .nav{display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem}
+    .btn-back{padding:.55rem 1.1rem;background:transparent;border:1px solid var(--border);border-radius:8px;cursor:pointer;color:var(--muted);font-size:.875rem;font-weight:500;transition:all .15s}
+    .btn-back:hover{background:var(--bg);color:var(--text)}
+    .btn-next{padding:.7rem 1.75rem;background:var(--primary);border:none;border-radius:10px;cursor:pointer;color:#fff;font-size:.9375rem;font-weight:600;transition:all .2s;display:flex;align-items:center;gap:.5rem}
+    .btn-next:hover:not(:disabled){background:var(--primary-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,.3)}
+    .btn-next:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;transform:none;box-shadow:none}
+    /* WELCOME */
+    .welcome{text-align:center;padding:2rem 1rem}
+    .w-icon{font-size:3.5rem;margin-bottom:1rem}
+    .w-title{font-size:1.75rem;font-weight:800;margin-bottom:.75rem}
+    .w-desc{font-size:1rem;color:var(--muted);line-height:1.6;max-width:480px;margin:0 auto 2rem}
+    .features{display:grid;grid-template-columns:repeat(3,1fr);gap:.875rem;margin-bottom:2rem;max-width:480px;margin:0 auto 2rem}
+    .feat{padding:.875rem;background:var(--bg);border-radius:12px;text-align:center}
+    .feat .fi{font-size:1.5rem;margin-bottom:.375rem}
+    .feat .fl{font-size:.75rem;color:var(--muted);font-weight:500;line-height:1.3}
+    .btn-start{padding:1rem 2.75rem;background:var(--primary);color:#fff;border:none;border-radius:12px;font-size:1.0625rem;font-weight:700;cursor:pointer;transition:all .2s}
+    .btn-start:hover{background:var(--primary-dark);transform:translateY(-2px);box-shadow:0 8px 20px rgba(37,99,235,.3)}
+    /* RESULTS */
+    .res-header{text-align:center;margin-bottom:2rem}
+    .res-icon{width:60px;height:60px;background:var(--primary-light);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.75rem;margin:0 auto 1rem}
+    .res-title{font-size:1.4rem;font-weight:800;margin-bottom:.5rem}
+    .res-sub{font-size:.9rem;color:var(--muted);line-height:1.5}
+    .res-card{background:var(--white);border-radius:16px;padding:1.5rem;margin-bottom:1rem;box-shadow:var(--shadow);border:1px solid var(--border);transition:border-color .2s}
+    .res-card.top{border-color:var(--primary);border-width:2px}
+    .res-card-header{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;margin-bottom:.5rem}
+    .rank-pill{padding:.2rem .7rem;border-radius:99px;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+    .r1{background:#fef3c7;color:#92400e}
+    .r2{background:#f1f5f9;color:#475569}
+    .r3{background:#f1f5f9;color:#64748b}
+    .match-pct{font-size:.8rem;color:var(--muted);white-space:nowrap}
+    .res-name{font-size:1.1rem;font-weight:700;margin-bottom:.25rem}
+    .res-cat{font-size:.75rem;color:var(--primary);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem}
+    .match-bar-wrap{height:4px;background:var(--border);border-radius:99px;overflow:hidden;margin-bottom:1rem}
+    .match-bar-fill{height:100%;border-radius:99px}
+    .mhigh{background:var(--primary)}
+    .mmed{background:var(--warning)}
+    .mlow{background:#cbd5e1}
+    .res-desc{font-size:.8625rem;color:var(--muted);line-height:1.55;margin-bottom:1rem}
+    .collapsible{cursor:pointer;border:none;background:none;padding:0;width:100%;text-align:left}
+    .sec-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem;cursor:pointer;user-select:none}
+    .sec-label svg{transition:transform .2s;flex-shrink:0}
+    .sec-label.open svg{transform:rotate(90deg)}
+    .list-panel{display:none}
+    .list-panel.open{display:block}
+    .list{display:flex;flex-direction:column;gap:.35rem;margin-bottom:1rem}
+    .list-item{display:flex;align-items:flex-start;gap:.5rem;font-size:.85rem;line-height:1.4}
+    .list-item.sym::before{content:"•";color:var(--primary);font-weight:900;flex-shrink:0;margin-top:1px}
+    .list-item.trt::before{content:"✓";color:var(--success);font-weight:900;flex-shrink:0;margin-top:1px}
+    .urgency{display:inline-flex;align-items:center;gap:.375rem;padding:.35rem .75rem;border-radius:8px;font-size:.78rem;font-weight:600;margin-top:.25rem}
+    .u-low{background:#d1fae5;color:#065f46}
+    .u-mod{background:#fef3c7;color:#92400e}
+    .u-high{background:#fee2e2;color:#991b1b}
+    .u-note{font-size:.78rem;color:var(--muted);margin-top:.5rem;line-height:1.45;padding:.5rem .75rem;background:var(--bg);border-radius:8px;border-left:3px solid var(--border)}
+    .res-disclaimer{background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:1.25rem;margin-top:1.5rem;font-size:.8rem;color:var(--muted);line-height:1.6}
+    .btn-restart{display:block;width:100%;padding:.875rem;background:var(--primary);color:#fff;border:none;border-radius:12px;font-size:1rem;font-weight:700;cursor:pointer;margin-top:1.25rem;transition:all .2s}
+    .btn-restart:hover{background:var(--primary-dark);transform:translateY(-1px)}
+    .fade-in{animation:fi .3s ease}
+    @keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    @media(max-width:480px){.features{grid-template-columns:1fr}.container{padding:1rem}.card{padding:1.25rem}.q-text{font-size:1.05rem}}
+    .emergency-banner{background:#fee2e2;border:2px solid #fca5a5;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem;font-size:.875rem;color:#991b1b;font-weight:600;display:flex;gap:.75rem;align-items:flex-start}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">⚕</div>
+  <div class="header-text">
+    <h1>Symptom Checker</h1>
+    <p>Educational use only — not a substitute for medical advice</p>
+  </div>
+</header>
+
+<div class="container">
+  <div class="disclaimer">
+    <span class="di">⚠️</span>
+    <span><strong>Important:</strong> This tool is for educational purposes only and does not provide a medical diagnosis. Always consult a qualified healthcare provider for any health concerns. If you are experiencing a medical emergency, <strong>call 911 immediately</strong>.</span>
+  </div>
+  <div id="app"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// CONDITIONS DATABASE
+// ═══════════════════════════════════════════════════
+const CONDITIONS = {
+  migraine:{name:"Migraine",cat:"Neurological",desc:"A neurological disorder causing recurrent, often severe headaches with sensory disturbances. Affects roughly 1 in 7 people worldwide.",symptoms:["Severe throbbing or pulsating headache (often one-sided)","Nausea and/or vomiting","Sensitivity to light (photophobia) and sound (phonophobia)","Visual aura — flashing lights, blind spots, or zigzag lines","Pain worsened by physical activity","Headache lasting 4–72 hours","Neck stiffness before onset"],treatments:["OTC pain relievers: ibuprofen, naproxen, or aspirin (taken early)","Prescription triptans — sumatriptan, rizatriptan (most effective)","Rest in a dark, quiet room with a cold compress","Anti-nausea medication if needed","Preventive daily medications (topiramate, propranolol, amitriptyline)","Identify and avoid personal triggers (stress, certain foods, irregular sleep)","CGRP antagonists (newer biologic option) for frequent migraines"],urgency:"mod",urgencyNote:"Seek emergency care if this is the 'worst headache of your life' or if accompanied by fever, stiff neck, confusion, weakness, or vision changes."},
+  tension_ha:{name:"Tension Headache",cat:"Neurological",desc:"The most common headache type — a dull, aching pressure feeling around the head, often related to stress or muscle tension.",symptoms:["Dull, steady, aching pain on both sides of the head","Sensation of tightness or pressure (like a band around the head)","Tenderness in scalp, neck, and shoulder muscles","No nausea or vomiting (usually)","Mild sensitivity to light or sound","Pain worsens with stress or poor posture"],treatments:["OTC pain relievers: acetaminophen, ibuprofen, or aspirin","Stress management and relaxation techniques (deep breathing, yoga)","Heat or ice applied to neck and shoulders","Regular sleep schedule and adequate hydration","Physical therapy or massage for chronic tension headaches","Avoid overusing pain medication — can cause rebound headaches"],urgency:"low",urgencyNote:"Usually not serious. See a doctor if headaches are frequent, severe, or interfere with daily life."},
+  hypertension:{name:"Hypertension (High Blood Pressure)",cat:"Cardiovascular",desc:"Persistently elevated blood pressure in the arteries. Often called the 'silent killer' because most people have no symptoms.",symptoms:["Often completely asymptomatic for years","Headache (especially at the back of the head, upon waking)","Dizziness or lightheadedness","Shortness of breath","Blurred vision","Nosebleeds in severe cases","Flushing or feeling of fullness in the head"],treatments:["Lifestyle: DASH diet, reduce sodium to <1500 mg/day","Regular aerobic exercise (150 min/week)","Maintain a healthy weight; limit alcohol","Quit smoking","Antihypertensive medications: ACE inhibitors, ARBs, beta-blockers, diuretics, calcium channel blockers","Regular blood pressure monitoring at home"],urgency:"mod",urgencyNote:"See a doctor soon to measure your BP. Go to the ER if BP is extremely high with severe headache, chest pain, confusion, or vision changes (hypertensive crisis)."},
+  vertigo:{name:"Vertigo / BPPV",cat:"Neurological",desc:"A sensation that you or your surroundings are spinning. Benign Paroxysmal Positional Vertigo (BPPV) is the most common cause.",symptoms:["False spinning sensation or dizziness triggered by head movement","Loss of balance or unsteadiness","Nausea and vomiting","Abnormal eye movements (nystagmus)","Symptoms last seconds to minutes (BPPV) or longer (Meniere's)","Feeling of ear fullness or ringing (in some types)"],treatments:["Epley maneuver (canalith repositioning) — highly effective for BPPV","Vestibular rehabilitation exercises","Meclizine (antihistamine) for symptom relief","Avoid sudden head movements during acute episodes","Diuretics or low-sodium diet for Meniere's disease","Referral to ENT or neurologist for persistent or unusual vertigo"],urgency:"mod",urgencyNote:"Seek emergency care if vertigo is sudden and accompanied by severe headache, double vision, difficulty speaking or walking, or facial numbness."},
+  common_cold:{name:"Common Cold",cat:"Respiratory / Viral",desc:"A very common viral infection of the upper respiratory tract, primarily caused by rhinoviruses. Usually mild and self-limiting.",symptoms:["Runny or stuffy nose (nasal congestion)","Sore or scratchy throat (early symptom)","Frequent sneezing","Mild cough","Low-grade fever (more common in children)","Mild body aches or headache","Generally feeling unwell (malaise); symptoms peak days 2–3"],treatments:["Rest and stay well-hydrated","OTC decongestants (pseudoephedrine) for nasal congestion","OTC pain relievers (acetaminophen or ibuprofen) for aches","Throat lozenges and warm liquids (broth, tea with honey) for sore throat","Saline nasal sprays or rinses for congestion relief","Honey for cough (adults and children over 1 year) — evidence-based"],urgency:"low",urgencyNote:"Usually resolves in 7–10 days. See a doctor if symptoms worsen after day 5, you develop a high fever, difficulty breathing, or chest pain."},
+  influenza:{name:"Influenza (Flu)",cat:"Respiratory / Viral",desc:"A contagious respiratory illness caused by influenza viruses, typically more severe and faster onset than the common cold.",symptoms:["Sudden onset of high fever (100–104°F / 38–40°C)","Chills and sweats","Severe muscle aches and body pain","Headache","Dry, persistent cough","Extreme fatigue and weakness (can be debilitating)","Sore throat and sometimes runny nose","Loss of appetite"],treatments:["Rest and plenty of fluids","Antiviral medications (oseltamivir/Tamiflu) — most effective within 48 hours of symptoms","OTC fever reducers and pain relievers (ibuprofen or acetaminophen)","Do NOT give aspirin to children (Reye's syndrome risk)","Isolate to prevent spreading to others","Annual flu vaccination for prevention"],urgency:"mod",urgencyNote:"Seek care promptly if you have difficulty breathing, persistent chest pain, confusion, severe vomiting, or belong to a high-risk group (elderly, pregnant, immunocompromised)."},
+  covid19:{name:"COVID-19",cat:"Respiratory / Viral",desc:"A respiratory illness caused by SARS-CoV-2, with a wide spectrum of severity from mild cold-like symptoms to serious pneumonia.",symptoms:["Fever or chills","Dry cough (most common)","Shortness of breath or difficulty breathing","Fatigue","Muscle or body aches","Loss of taste (ageusia) or smell (anosmia) — hallmark symptom","Sore throat, congestion, or runny nose","Headache","Nausea, vomiting, or diarrhea"],treatments:["Isolate immediately to prevent spread","Rest and stay well-hydrated","OTC medications for fever and pain","Antiviral treatments (nirmatrelvir/Paxlovid) for high-risk patients — requires prescription, within 5 days of symptoms","Monitor oxygen saturation with a pulse oximeter","COVID-19 vaccination and boosters for prevention"],urgency:"mod",urgencyNote:"Seek emergency care for severe breathing difficulty, persistent chest pressure, confusion, inability to stay awake, or bluish lips/fingernails."},
+  strep:{name:"Strep Throat",cat:"Respiratory / Bacterial",desc:"A bacterial infection of the throat and tonsils caused by Group A Streptococcus. Requires antibiotics to prevent complications.",symptoms:["Sudden, severe sore throat — often the worst you've felt","Significant pain with swallowing","High fever (101°F / 38.3°C or higher)","Red, swollen tonsils, sometimes with white patches or pus","Tiny red spots on the roof of the mouth (petechiae)","Swollen, tender lymph nodes in the front of the neck","Headache and body aches — NO cough (absence of cough is a key clue)"],treatments:["Antibiotics (penicillin or amoxicillin) — requires prescription, mandatory to prevent complications","Complete the FULL antibiotic course even if feeling better","OTC pain relievers and fever reducers (ibuprofen or acetaminophen)","Salt water gargling to reduce pain and swelling","Throat lozenges and cool or warm liquids","Stay home and rest until fever-free and 24 hours on antibiotics"],urgency:"mod",urgencyNote:"See a doctor for a rapid strep test and antibiotics. Untreated strep can lead to rheumatic fever, which can damage the heart."},
+  allergic_rhinitis:{name:"Allergic Rhinitis (Hay Fever)",cat:"Respiratory / Allergic",desc:"An allergic reaction causing cold-like symptoms, triggered by airborne allergens like pollen, dust mites, mold, or pet dander.",symptoms:["Runny nose with clear, watery discharge","Sneezing fits (often multiple sneezes in a row)","Itchy nose, eyes, and throat","Watery, red, or swollen eyes (allergic conjunctivitis)","Nasal congestion and blocked sinuses","Postnasal drip causing sore throat","Symptoms seasonal (tree/grass/weed pollen) or year-round (dust mites, pets)"],treatments:["Antihistamines (cetirizine/Zyrtec, loratadine/Claritin, fexofenadine/Allegra)","Intranasal corticosteroid sprays — most effective treatment (fluticasone, budesonide)","Decongestants for nasal congestion (short-term use)","Avoid known allergens, keep windows closed during high pollen days","HEPA air purifiers and regular vacuuming","Allergy immunotherapy (shots or sublingual drops) for long-term relief"],urgency:"low",urgencyNote:"Not dangerous in most cases. See an allergist if symptoms are severe, uncontrolled, or significantly impact your quality of life."},
+  asthma:{name:"Asthma",cat:"Respiratory / Chronic",desc:"A chronic inflammatory condition where airways narrow and swell, producing extra mucus, making breathing difficult.",symptoms:["Wheezing (whistling or squeaky sound when breathing)","Shortness of breath, especially with activity","Chest tightness or pressure","Coughing — often worse at night or early morning","Symptoms triggered by exercise, cold air, allergens, or smoke","Respiratory infections can trigger significant worsening","Symptoms vary in frequency and intensity"],treatments:["Short-acting bronchodilators (albuterol inhaler) for quick relief — carry at all times","Inhaled corticosteroids (ICS) for long-term control (most important)","Long-acting bronchodilators (LABA) as add-on to ICS","Identify and avoid personal triggers","Develop an asthma action plan with your doctor","Leukotriene modifiers (montelukast) as alternative or add-on"],urgency:"mod",urgencyNote:"EMERGENCY: Call 911 if rescue inhaler provides no relief, breathing is very difficult, you're struggling to complete sentences, or lips/fingernails turn bluish."},
+  bronchitis:{name:"Acute Bronchitis",cat:"Respiratory / Viral",desc:"Inflammation of the bronchial tube lining, usually from a viral infection, causing persistent cough and mucus production.",symptoms:["Persistent cough — may be productive (mucus) or dry","Mucus that may be clear, white, yellow, or green","Chest discomfort or soreness from coughing","Fatigue and mild malaise","Slight fever and chills","Mild shortness of breath during activity","Wheezing in some cases"],treatments:["Rest and increased fluid intake to thin mucus","Honey for cough relief (proven effective)","OTC cough suppressants or expectorants (guaifenesin)","Use a humidifier to ease breathing and soothe airways","Antibiotics are NOT usually needed (viral cause in 90%+ of cases)","Bronchodilator inhaler if wheezing is present","See a doctor if symptoms persist beyond 3 weeks or worsen significantly"],urgency:"low",urgencyNote:"Usually resolves in 2–3 weeks. See a doctor if coughing blood, high fever (>103°F), severe breathing difficulty, or symptoms that worsen after improving."},
+  gerd:{name:"GERD (Acid Reflux / Heartburn)",cat:"Digestive / GI",desc:"Gastroesophageal reflux disease — stomach acid frequently flows back into the esophagus, causing irritation and symptoms.",symptoms:["Burning chest pain (heartburn), especially after eating or when lying down","Regurgitation of food or sour liquid into the mouth","Difficulty or pain with swallowing","Sensation of a lump in the throat (globus sensation)","Chronic cough or hoarseness (from acid reaching throat)","Worsening symptoms when lying down, bending, or after large meals","Dental erosion over time"],treatments:["Antacids (Tums, Mylanta) for immediate but short-term relief","H2 blockers (famotidine/Pepcid) to reduce acid production","Proton pump inhibitors (omeprazole/Prilosec, pantoprazole) for sustained relief","Avoid trigger foods: spicy, fatty, citrus, caffeine, carbonation, alcohol, chocolate","Eat smaller meals; avoid lying down within 3 hours of eating","Elevate the head of the bed 6–8 inches; maintain a healthy weight"],urgency:"low",urgencyNote:"See a doctor if symptoms are frequent, persistent, or accompanied by difficulty swallowing, unexplained weight loss, or vomiting blood."},
+  ibs:{name:"Irritable Bowel Syndrome (IBS)",cat:"Digestive / Functional",desc:"A common functional GI disorder causing chronic abdominal pain and altered bowel habits without structural damage to the bowel.",symptoms:["Abdominal pain or cramping, often relieved by a bowel movement","Bloating and excess gas","Diarrhea, constipation, or alternating between both","Mucus in the stool (white)","Urgent need to have a bowel movement","Symptoms often triggered or worsened by stress, anxiety, or certain foods","No blood in stool (if blood is present, see a doctor urgently)"],treatments:["Dietary changes: low-FODMAP diet (fermentable carbs) is well-supported","Soluble fiber supplementation for constipation-predominant IBS","Antispasmodics (hyoscine, dicycloverine) for cramping","Anti-diarrheal medications (loperamide/Imodium) as needed","Stress management, mindfulness, and regular exercise","Gut-directed cognitive behavioral therapy (CBT) has strong evidence","Peppermint oil capsules (enteric-coated) for cramps and bloating"],urgency:"low",urgencyNote:"See a doctor for proper diagnosis. Seek urgent care if you have rectal bleeding, unexplained weight loss, fever, or anemia with GI symptoms."},
+  gastroenteritis:{name:"Gastroenteritis (Stomach Bug)",cat:"Digestive / Infectious",desc:"Inflammation of the stomach and intestines, typically from a viral (most common) or bacterial infection.",symptoms:["Sudden onset of nausea and vomiting","Watery, loose diarrhea (may be frequent)","Abdominal cramps and pain","Low-grade fever","Headache and muscle aches","Dehydration symptoms: dry mouth, decreased urination, dizziness","Usually lasts 1–3 days for viral causes"],treatments:["Stay well-hydrated with oral rehydration solutions (Pedialyte, Hydralyte)","Small sips frequently — avoid large volumes at once","Bland diet when tolerated (bananas, rice, toast, crackers)","Anti-nausea medications (ondansetron) if available","Rest","Avoid dairy, fatty, or spicy foods during recovery","Antibiotics only for confirmed bacterial causes (Salmonella, Campylobacter)"],urgency:"low",urgencyNote:"See a doctor if unable to keep any fluids down for 24+ hours, blood in stool, high fever, severe abdominal pain, or signs of significant dehydration (especially in children or elderly)."},
+  peptic_ulcer:{name:"Peptic Ulcer",cat:"Digestive / GI",desc:"Sores (ulcers) in the lining of the stomach or upper small intestine, usually caused by H. pylori infection or NSAID overuse.",symptoms:["Burning or gnawing stomach pain, often between meals or at night","Pain that is temporarily relieved by eating food or taking antacids","Bloating and belching","Nausea and sometimes vomiting","Feeling of fullness after eating small amounts","Heartburn","Dark, tarry stools (bleeding ulcer — see a doctor immediately)"],treatments:["Proton pump inhibitors (omeprazole, lansoprazole) to reduce stomach acid","Antibiotics (two-drug combination) if H. pylori infection is confirmed","Discontinue NSAIDs (ibuprofen, aspirin, naproxen) if possible","Antacids for symptom relief","Avoid alcohol, smoking, and extremely spicy foods","Follow-up testing to confirm H. pylori eradication"],urgency:"mod",urgencyNote:"See a doctor. Go to the ER immediately for vomiting blood, black or tarry stools, or sudden, severe stomach pain (possible perforation)."},
+  appendicitis:{name:"Appendicitis",cat:"Digestive / Surgical Emergency",desc:"Inflammation of the appendix — this is a surgical emergency requiring immediate medical evaluation.",symptoms:["Pain that starts around the navel then moves to the lower right abdomen","Pain that intensifies over hours and worsens with movement, coughing, or deep breathing","Nausea and vomiting","Fever (low-grade early, higher if appendix ruptures)","Loss of appetite","Inability to pass gas","Rigid, guarded abdomen (sign of inflammation)"],treatments:["SEEK EMERGENCY CARE IMMEDIATELY — do not wait","Surgical removal of the appendix (appendectomy) — often laparoscopic","IV antibiotics before and after surgery","Some uncomplicated cases may be treated with antibiotics alone (discuss with surgeon)","Do NOT eat, drink, or take pain medication until evaluated — can mask symptoms"],urgency:"high",urgencyNote:"THIS IS A MEDICAL EMERGENCY. Go to the emergency room now. A ruptured appendix is life-threatening and can occur within 24–72 hours of onset."},
+  uti:{name:"Urinary Tract Infection (UTI)",cat:"Urinary / Infectious",desc:"A bacterial infection in the urinary system — bladder (cystitis) or urethra. Very common, especially in women.",symptoms:["Burning or stinging sensation when urinating","Frequent, urgent need to urinate (often with little urine output)","Cloudy, dark, or strong-smelling urine","Pelvic pain or pressure (in women)","Rectal discomfort (in men)","Blood in urine (pink or red tinge)","Low-grade fever or chills (may indicate kidney involvement)"],treatments:["Antibiotics (trimethoprim-sulfamethoxazole, nitrofurantoin, or fosfomycin) — requires prescription","Drink plenty of water to help flush bacteria","Phenazopyridine (AZO) for burning/urgency symptom relief (turns urine orange)","Avoid caffeine, alcohol, and citrus during treatment","Cranberry products may help prevent future UTIs","Complete the full antibiotic course even if feeling better"],urgency:"mod",urgencyNote:"See a doctor for antibiotics. Seek urgent care if you develop fever, back or flank pain, nausea or vomiting — these suggest kidney infection (pyelonephritis), which needs IV antibiotics."},
+  kidney_stones:{name:"Kidney Stones",cat:"Urinary / Acute",desc:"Hard mineral and salt deposits that form in the kidneys and can cause excruciating pain when moving through the urinary tract.",symptoms:["Severe, sharp pain in the back, side, lower abdomen, or groin (renal colic)","Pain that comes in waves and fluctuates in intensity","Blood in the urine (pink, red, or brown — hematuria)","Painful urination","Nausea and vomiting","Frequent urge to urinate","Fever and chills if an infection is also present"],treatments:["Pain management: NSAIDs (ketorolac) or opioids for severe pain","Drink 2–3 liters of water daily to help pass the stone","Alpha-blockers (tamsulosin) to relax ureter and aid stone passage","Shock wave lithotripsy (ESWL) for stones 4–20mm","Ureteroscopy or percutaneous nephrolithotomy for large or stuck stones","Dietary prevention: reduce sodium, animal protein, oxalate foods; stay hydrated"],urgency:"high",urgencyNote:"Go to urgent care or the ER for severe pain. Emergency care is needed if fever is present with stone symptoms (infected obstructed kidney is an emergency) or if you're unable to urinate."},
+  eczema:{name:"Eczema (Atopic Dermatitis)",cat:"Skin / Inflammatory",desc:"A chronic inflammatory skin condition causing dry, itchy, and inflamed skin. Often starts in childhood and runs in families.",symptoms:["Dry, sensitive, and easily irritated skin","Intense itching, especially at night","Red to brownish-gray patches","Small, raised bumps that may weep fluid and crust over","Thickened, cracked, or scaly skin","Raw, swollen skin from scratching","Common locations: elbow creases, behind knees, neck, wrists, and face"],treatments:["Moisturize frequently with thick, fragrance-free creams or ointments (apply within 3 min of bathing)","Topical corticosteroids (hydrocortisone to stronger prescriptions) to reduce flares","Topical calcineurin inhibitors (tacrolimus, pimecrolimus) for sensitive areas","Antihistamines for itch relief (especially at night)","Identify and avoid triggers: harsh soaps, fragrances, wool, sweating, stress","Biologic medications (dupilumab/Dupixent) for moderate-to-severe cases"],urgency:"low",urgencyNote:"See a dermatologist for proper diagnosis, prescription treatments, and a long-term management plan."},
+  contact_dermatitis:{name:"Contact Dermatitis",cat:"Skin / Allergic",desc:"A localized red, itchy rash caused by direct skin contact with a substance that either irritates the skin or triggers an allergic reaction.",symptoms:["Red rash precisely limited to the area of skin contact","Intense itching","Dry, cracked, or scaly skin","Bumps, blisters, and possible weeping","Swelling, burning, or tenderness","Rash appears where the triggering item touched the skin","Can develop hours (allergic) or immediately (irritant) after contact"],treatments:["Identify and permanently avoid the triggering substance","Wash the affected skin with mild soap and cool water immediately","Topical corticosteroid cream (OTC hydrocortisone 1% or prescription strength)","Cool, wet compresses for soothing relief","Oral antihistamines for itching, especially at night","Oral or injected corticosteroids for severe, widespread reactions"],urgency:"low",urgencyNote:"See a doctor if rash doesn't improve in 2–3 weeks, is very severe, covers large areas, or affects the eyes or mucous membranes."},
+  hives:{name:"Hives (Urticaria)",cat:"Skin / Allergic",desc:"Raised, red, itchy welts on the skin — a very common allergic reaction that can appear anywhere on the body and change rapidly.",symptoms:["Red or skin-colored raised welts (wheals) of varying sizes","Welts that appear, change shape, and disappear within hours","Skin turns white (blanches) when pressed","Intense itching or burning sensation","May be accompanied by angioedema (deeper swelling, especially lips/eyes)","Can be triggered by foods, medications, infections, insect stings, or stress","Individual welts typically resolve within 24 hours"],treatments:["Antihistamines (cetirizine, loratadine, diphenhydramine for nighttime)","Cool compresses for soothing relief","Avoid scratching (worsens inflammation)","Identify and remove the triggering allergen","Oral corticosteroids for severe or widespread cases","Epinephrine (EpiPen) if anaphylaxis develops — use immediately"],urgency:"mod",urgencyNote:"CALL 911 if hives are accompanied by throat swelling, difficulty breathing, dizziness, or rapid heartbeat — this is anaphylaxis and is life-threatening."},
+  psoriasis:{name:"Psoriasis",cat:"Skin / Autoimmune",desc:"A chronic autoimmune condition causing rapid buildup of skin cells, resulting in thick, scaly patches. Not contagious.",symptoms:["Red or pink patches covered with thick, silvery-white scales","Dry, cracked skin that may bleed","Itching, burning, or soreness in affected areas","Thickened, pitted, or ridged nails","Joint pain and stiffness (psoriatic arthritis — affects ~30%)","Common locations: scalp, elbows, knees, lower back, nails","Cycles of flares and remissions"],treatments:["Topical corticosteroids (mainstay of mild-moderate treatment)","Vitamin D analogues (calcipotriene/Dovonex) to slow skin cell growth","Topical retinoids (tazarotene)","Light therapy: UVB phototherapy or PUVA","Systemic medications (methotrexate, cyclosporine) for moderate-severe cases","Biologic medications (TNF inhibitors, IL-17/IL-23 inhibitors) — highly effective","Stress management; stress is a major trigger"],urgency:"low",urgencyNote:"See a dermatologist for diagnosis. If you have joint pain and swelling, also see a rheumatologist to rule out psoriatic arthritis."},
+  muscle_strain:{name:"Muscle Strain",cat:"Musculoskeletal",desc:"An injury to a muscle or tendon caused by overuse, improper lifting, or a sudden, forceful movement.",symptoms:["Sudden onset of localized pain during or after activity","Muscle spasm in the affected area","Limited range of motion","Swelling, bruising, or redness around the injury site","Tenderness to touch","Weakness in the affected muscle","Pain that worsens with specific movements"],treatments:["RICE method: Rest, Ice (20 min, 3–4x daily), Compression, Elevation for first 48–72 hours","OTC anti-inflammatory pain relievers (ibuprofen, naproxen)","Acetaminophen for pain if NSAIDs not tolerated","Gentle stretching and gradual return to activity after 48–72 hours","Heat therapy (warm compress, heating pad) after the first 3 days","Physical therapy for moderate-to-severe strains","Prescribed muscle relaxants for severe spasm (short-term)"],urgency:"low",urgencyNote:"Most strains resolve in days to a few weeks. See a doctor if severe pain, significant swelling/bruising, a 'pop' was heard at injury, or no improvement after 2 weeks."},
+  arthritis:{name:"Osteoarthritis",cat:"Musculoskeletal / Chronic",desc:"Degeneration of joint cartilage causing pain, stiffness, and reduced mobility. Most common in older adults and in high-use joints.",symptoms:["Joint pain that worsens with activity and improves with rest","Morning stiffness that typically lasts less than 30 minutes","Reduced range of motion in affected joints","Grating, cracking, or popping sensation (crepitus)","Bone spurs that may be felt around the joint","Swelling and tenderness around the joint","Most common in knees, hips, hands, and spine"],treatments:["OTC pain relievers: acetaminophen (for mild pain), NSAIDs (ibuprofen, naproxen) for inflammation","Topical NSAIDs (diclofenac gel/Voltaren) — effective with fewer side effects","Regular low-impact exercise: swimming, cycling, walking (reduces pain and improves function)","Physical therapy for strength and joint stability","Weight loss to reduce load on weight-bearing joints","Intra-articular injections: corticosteroids or hyaluronic acid","Joint replacement surgery for severe, end-stage disease"],urgency:"low",urgencyNote:"See a doctor for diagnosis and a management plan. Note: Rheumatoid arthritis (autoimmune, different treatment) has similar symptoms — morning stiffness >1 hour and symmetric joint involvement are key differences."},
+  lower_back:{name:"Lower Back Pain",cat:"Musculoskeletal",desc:"Pain in the lumbar region of the spine — one of the most common medical complaints worldwide. Usually mechanical in origin.",symptoms:["Dull aching or sharp, stabbing pain in the lower back","Pain that radiates into the buttocks, thigh, or down the leg (sciatica)","Muscle stiffness and spasm","Pain worsened by bending, lifting, prolonged sitting or standing","Limited flexibility or reduced range of motion in the spine","Numbness or tingling down the leg (nerve involvement)","Pain that improves with movement and walking"],treatments:["Stay active — avoid prolonged bed rest (worsens recovery)","OTC NSAIDs (ibuprofen, naproxen) or acetaminophen","Application of ice (first 48 hours) then heat","Physical therapy: core strengthening, stretching, McKenzie method","Short-term muscle relaxants if prescribed by a doctor","Ergonomic adjustments to workstation and sleeping position","Epidural steroid injections for severe nerve-related pain"],urgency:"low",urgencyNote:"See a doctor urgently if pain follows significant trauma, or causes bladder/bowel dysfunction, saddle-area numbness, or progressive leg weakness — these may indicate cauda equina syndrome."},
+  anxiety:{name:"Generalized Anxiety Disorder (GAD)",cat:"Mental Health",desc:"A condition characterized by persistent, excessive worry about various aspects of life that is difficult to control.",symptoms:["Excessive, uncontrollable worry about multiple areas of life","Restlessness or feeling on edge or 'keyed up'","Fatigue and difficulty concentrating ('mind going blank')","Irritability","Muscle tension, especially in neck, shoulders, and back","Sleep disturbances — difficulty falling or staying asleep","Physical symptoms: rapid heartbeat, sweating, trembling, upset stomach"],treatments:["Cognitive-behavioral therapy (CBT) — gold standard, very effective","SSRIs (sertraline, escitalopram) or SNRIs (venlafaxine) — first-line medications","Buspirone — non-habit-forming anti-anxiety medication","Regular aerobic exercise (strong, well-researched benefit for anxiety)","Mindfulness-based stress reduction (MBSR) and relaxation techniques","Limit caffeine and alcohol; maintain regular sleep schedule","Support groups and stress management skills"],urgency:"mod",urgencyNote:"Please seek mental health support — anxiety is very treatable. If you are having thoughts of harming yourself, call or text 988 (Suicide & Crisis Lifeline) or go to the ER."},
+  depression:{name:"Major Depressive Disorder (Depression)",cat:"Mental Health",desc:"A mood disorder causing persistent feelings of sadness, emptiness, and hopelessness, along with physical and cognitive symptoms.",symptoms:["Persistent sad, empty, hopeless, or 'numb' mood, most of the day, nearly every day","Loss of interest or pleasure in activities once enjoyed (anhedonia)","Significant weight loss/gain or change in appetite","Insomnia or sleeping too much","Fatigue, low energy, or feeling 'slowed down'","Difficulty concentrating, remembering, or making decisions","Feelings of worthlessness, guilt, or self-blame","Recurrent thoughts of death or suicide"],treatments:["Psychotherapy: CBT, interpersonal therapy (IPT), or behavioral activation","Antidepressants: SSRIs (fluoxetine, sertraline) or SNRIs — often combined with therapy for best results","Regular aerobic exercise (proven to be as effective as medication in mild-moderate depression)","Social support and maintaining daily structure and routines","Light therapy for seasonal affective disorder (SAD)","Electroconvulsive therapy (ECT) for severe or treatment-resistant depression","Ketamine or esketamine (Spravato) for treatment-resistant cases"],urgency:"mod",urgencyNote:"Depression is very treatable — please seek help. If you are having thoughts of suicide, call or text 988 (Suicide & Crisis Lifeline), text HOME to 741741, or go to the nearest ER."},
+  panic_disorder:{name:"Panic Disorder",cat:"Mental Health",desc:"Recurrent, unexpected panic attacks with intense physical symptoms, accompanied by ongoing fear of future attacks.",symptoms:["Sudden, intense episodes of overwhelming fear (panic attacks) peaking within minutes","Racing or pounding heart (palpitations)","Shortness of breath or feeling smothered","Chest pain or tightness (can mimic heart attack)","Dizziness, lightheadedness, or feeling faint","Sweating, trembling, or shaking","Sense of unreality (derealization) or detachment from oneself (depersonalization)","Fear of dying, losing control, or 'going crazy' during attacks"],treatments:["Cognitive-behavioral therapy (CBT) — highly effective; includes interoceptive exposure","SSRIs (first-line medication) or SNRIs — take weeks to work","Benzodiazepines: effective for acute attacks but habit-forming (short-term only)","Diaphragmatic breathing techniques to manage acute symptoms","Gradually facing avoided situations (exposure therapy) with therapist guidance","Avoid caffeine and alcohol; get regular sleep","Psychoeducation: understanding that panic attacks, while terrifying, are not dangerous"],urgency:"mod",urgencyNote:"First episode of chest pain and shortness of breath should be medically evaluated to rule out cardiac causes before attributing to panic. Seek emergency care if uncertain."},
+  insomnia:{name:"Insomnia",cat:"Mental Health / Sleep",desc:"Persistent difficulty falling asleep, staying asleep, or getting restorative sleep, causing daytime impairment.",symptoms:["Difficulty falling asleep at bedtime (sleep onset insomnia)","Waking frequently during the night and struggling to return to sleep","Waking too early in the morning","Not feeling rested or refreshed after sleep","Daytime fatigue, low energy, and sleepiness","Difficulty concentrating, memory problems, or poor performance","Irritability, anxiety, or low mood","Worry about sleep itself — becomes self-perpetuating"],treatments:["Cognitive-behavioral therapy for insomnia (CBT-I) — most effective long-term treatment; outperforms medication","Sleep hygiene: consistent wake time daily, dark/cool/quiet room, no screens 1 hour before bed","Stimulus control: use bed only for sleep and sex; get out of bed if unable to sleep after 20 min","Sleep restriction therapy (guided) — paradoxically improves sleep quality","Melatonin supplements: useful for sleep timing issues","Short-term sleep medications (zolpidem) — as directed by doctor, not for long-term use","Address underlying conditions: anxiety, depression, chronic pain, sleep apnea"],urgency:"low",urgencyNote:"See a doctor or sleep specialist if insomnia has persisted for more than 3 months or is significantly impairing daily functioning. Rule out sleep apnea (may need a sleep study)."},
+  fever_general:{name:"Systemic Viral Illness / Fever",cat:"Infectious / General",desc:"A general, non-specific viral or bacterial illness causing fever and systemic symptoms. Requires evaluation to determine specific cause.",symptoms:["Fever (above 100.4°F / 38°C)","Chills and sweating (may alternate)","Generalized body aches and myalgia","Headache","Fatigue and malaise","Loss of appetite","General feeling of being unwell"],treatments:["Rest and stay well-hydrated","Fever reducers: acetaminophen or ibuprofen (alternate for better control if needed)","Monitor temperature regularly","Seek medical evaluation to determine the underlying cause","Antibiotics if a bacterial infection is confirmed (not for viral illnesses)","Antiviral medications for specific diagnosed viral infections"],urgency:"mod",urgencyNote:"See a doctor if fever is above 103°F, lasts more than 3 days, or is accompanied by severe symptoms. Go to the ER for stiff neck, severe headache, rash, confusion, or difficulty breathing with fever."},
+  anemia:{name:"Anemia",cat:"Blood / Systemic",desc:"A condition where there aren't enough healthy red blood cells to carry adequate oxygen to the body's tissues.",symptoms:["Persistent fatigue and weakness (most common symptom)","Pale or sallow (yellowish) skin","Shortness of breath, especially with exertion","Dizziness or lightheadedness","Fast or irregular heartbeat (palpitations)","Cold hands and feet","Headache","Brittle or spoon-shaped nails"],treatments:["Iron supplements (ferrous sulfate) for iron-deficiency anemia","Vitamin B12 supplements or monthly injections for B12-deficiency anemia","Folate supplements for folate-deficiency anemia","Dietary changes: increase iron-rich foods (lean red meat, spinach, lentils, fortified cereals)","Treat the underlying cause (e.g., stop bleeding, treat chronic disease)","Blood transfusions for severe acute anemia","Erythropoiesis-stimulating agents for anemia of chronic kidney disease"],urgency:"mod",urgencyNote:"See a doctor for blood tests (complete blood count) to confirm the diagnosis and identify the type. Seek urgent care for severe shortness of breath, chest pain, or fainting."},
+  diabetes:{name:"Type 2 Diabetes (Risk Indicator)",cat:"Metabolic / Endocrine",desc:"A metabolic disorder where the body doesn't use insulin effectively, leading to elevated blood sugar levels over time.",symptoms:["Increased thirst (polydipsia)","Frequent urination (polyuria), especially at night","Increased hunger even after eating","Unexplained weight loss","Fatigue and lack of energy","Blurred vision (from lens swelling due to high sugar)","Slow-healing sores or cuts","Frequent infections (skin, urinary tract, yeast)","Tingling, numbness, or pain in hands or feet (neuropathy)"],treatments:["Regular blood glucose monitoring","Healthy diet: reduce refined carbohydrates, sugars, and processed foods; increase fiber","Regular physical activity (improves insulin sensitivity significantly)","Metformin — first-line oral medication","Other medications: SGLT-2 inhibitors, GLP-1 agonists, DPP-4 inhibitors as needed","Insulin therapy if oral medications insufficient","Weight management and smoking cessation"],urgency:"mod",urgencyNote:"See a doctor for fasting blood glucose and HbA1c tests to confirm. Uncontrolled diabetes can lead to serious complications affecting the heart, kidneys, eyes, and nerves."},
+  gout:{name:"Gout",cat:"Musculoskeletal / Metabolic",desc:"A form of inflammatory arthritis caused by uric acid crystal deposits in joints, causing sudden, severe pain attacks.",symptoms:["Sudden onset of severe, intense joint pain — often at night","Big toe is most commonly affected (podagra), also ankle, knee, wrist","Joint feels hot, swollen, and appears red or purplish","Pain is often described as excruciating — even light touch is unbearable","Acute attacks typically last 3–10 days without treatment","Tophi (lumps) under skin in chronic gout","Decreased range of motion in affected joint"],treatments:["NSAIDs (indomethacin, naproxen) as first-line for acute attacks","Colchicine (most effective when taken early in an attack)","Oral or injected corticosteroids if NSAIDs and colchicine not tolerated","Elevate and rest the affected joint; apply ice packs","Uric acid-lowering therapy (allopurinol, febuxostat) for prevention (not during acute attacks)","Dietary changes: limit alcohol (especially beer), red meat, shellfish, and high-fructose corn syrup","Stay well-hydrated — 8+ glasses of water daily"],urgency:"mod",urgencyNote:"See a doctor for diagnosis (serum uric acid, possible joint aspiration). Seek urgent care if a joint is extremely hot and swollen with a fever — this could be an infected joint (septic arthritis), which is an emergency."}
+};
+
+// ═══════════════════════════════════════════════════
+// QUESTIONS
+// ═══════════════════════════════════════════════════
+const QUESTIONS = {
+  start:{
+    text:"What is your primary concern today?",
+    sub:"Select the area or symptom type that best describes your main issue.",
+    opts:[
+      {t:"Head or neurological symptoms",sub:"Headache, dizziness, vision, balance",icon:"🧠",next:"head1",s:{}},
+      {t:"Chest or respiratory symptoms",sub:"Cough, breathing difficulty, sore throat",icon:"🫁",next:"resp1",s:{}},
+      {t:"Stomach or digestive symptoms",sub:"Nausea, stomach pain, heartburn, bowel changes",icon:"🫃",next:"dig1",s:{}},
+      {t:"Urinary symptoms",sub:"Painful urination, frequent urges, back pain",icon:"🫘",next:"uri1",s:{}},
+      {t:"Skin symptoms",sub:"Rash, itching, redness, or lesions",icon:"🩹",next:"skin1",s:{}},
+      {t:"Muscle or joint pain",sub:"Pain, stiffness, swelling in muscles or joints",icon:"🦵",next:"msk1",s:{}},
+      {t:"Mental health concerns",sub:"Anxiety, depression, panic, or sleep problems",icon:"💆",next:"mh1",s:{}},
+      {t:"General or systemic symptoms",sub:"Fever, fatigue, weight changes, thirst",icon:"🌡️",next:"gen1",s:{}}
+    ]
+  },
+  // HEAD
+  head1:{
+    text:"How would you best describe your head or neurological symptom?",
+    opts:[
+      {t:"Severe, throbbing headache — often on one side",icon:"⚡",next:"head2",s:{migraine:9,tension_ha:2,hypertension:2}},
+      {t:"Dull, pressure or tightening feeling around the whole head",icon:"🔄",next:"head2",s:{tension_ha:9,migraine:2,hypertension:1}},
+      {t:"Dizziness or sensation that the room is spinning",icon:"🌀",next:"head2",s:{vertigo:10,hypertension:3,anemia:4}},
+      {t:"Headache combined with high blood pressure concerns",icon:"💉",next:"head2",s:{hypertension:10,migraine:2}}
+    ]
+  },
+  head2:{
+    text:"Which associated symptoms do you also experience?",
+    opts:[
+      {t:"Nausea, vomiting, or sensitivity to light and sound",icon:"🤢",next:"head3",s:{migraine:9,influenza:2,vertigo:3}},
+      {t:"Visual disturbances — flashing lights, blind spots, or zigzag lines",icon:"👁️",next:"head3",s:{migraine:10,hypertension:3}},
+      {t:"Loss of balance, unsteadiness, or difficulty walking",icon:"🚶",next:"head3",s:{vertigo:9,hypertension:2}},
+      {t:"None of the above — just the headache or dizziness",icon:"❌",next:"head3",s:{tension_ha:4,hypertension:2}}
+    ]
+  },
+  head3:{
+    text:"What tends to trigger or worsen your symptoms?",
+    opts:[
+      {t:"Stress, poor sleep, or certain foods (cheese, wine, caffeine)",icon:"😓",next:"fever",s:{migraine:8,tension_ha:5}},
+      {t:"Changing head or body position",icon:"↕️",next:"fever",s:{vertigo:10}},
+      {t:"Physical exertion or exercise",icon:"🏃",next:"fever",s:{migraine:5,hypertension:4}},
+      {t:"No clear trigger or it's persistent/constant",icon:"❓",next:"fever",s:{tension_ha:4,hypertension:5}}
+    ]
+  },
+  // RESPIRATORY
+  resp1:{
+    text:"Which respiratory symptom is most prominent for you?",
+    opts:[
+      {t:"Runny nose, sneezing, and mild sore throat",icon:"🤧",next:"resp2",s:{common_cold:9,allergic_rhinitis:5,influenza:2}},
+      {t:"Severe sore throat, pain on swallowing, with fever",icon:"🦠",next:"resp2",s:{strep:10,influenza:4,common_cold:2}},
+      {t:"Cough — with or without mucus/phlegm",icon:"😮‍💨",next:"resp2",s:{bronchitis:8,common_cold:5,asthma:4,influenza:3,covid19:5}},
+      {t:"Shortness of breath, chest tightness, or wheezing",icon:"😮",next:"resp2",s:{asthma:10,bronchitis:4,covid19:5}},
+      {t:"Itchy, watery eyes AND runny nose — especially seasonal",icon:"🌿",next:"resp2",s:{allergic_rhinitis:12,common_cold:2}}
+    ]
+  },
+  resp2:{
+    text:"Do you have fever or significant body aches?",
+    opts:[
+      {t:"High fever (above 101°F / 38.5°C) AND severe body aches",icon:"🔥",next:"resp3",s:{influenza:10,covid19:7,strep:5,fever_general:5}},
+      {t:"Mild or low-grade fever",icon:"🌡️",next:"resp3",s:{common_cold:5,covid19:5,strep:4,bronchitis:3}},
+      {t:"No fever, but feeling achy or run down",icon:"😟",next:"resp3",s:{common_cold:4,allergic_rhinitis:3}},
+      {t:"No fever and no body aches",icon:"👍",next:"resp3",s:{allergic_rhinitis:6,asthma:3,common_cold:2}}
+    ]
+  },
+  resp3:{
+    text:"How did your symptoms begin?",
+    opts:[
+      {t:"Sudden onset — felt well, then became sick very quickly",icon:"⚡",next:"dur",s:{influenza:8,strep:6,covid19:4}},
+      {t:"Gradual onset over 1–2 days",icon:"📈",next:"dur",s:{common_cold:8,bronchitis:5,covid19:5}},
+      {t:"Recurring or seasonal pattern (predictable times of year)",icon:"🔄",next:"dur",s:{allergic_rhinitis:12,asthma:6}},
+      {t:"Chronic or on-and-off for weeks to months",icon:"↕️",next:"dur",s:{asthma:8,allergic_rhinitis:5}}
+    ]
+  },
+  // DIGESTIVE
+  dig1:{
+    text:"What is your main digestive symptom?",
+    opts:[
+      {t:"Heartburn or burning chest/stomach pain after eating",icon:"🔥",next:"dig2",s:{gerd:12,peptic_ulcer:5}},
+      {t:"Nausea, vomiting, and/or diarrhea",icon:"🤢",next:"dig2",s:{gastroenteritis:10,peptic_ulcer:3,appendicitis:3}},
+      {t:"Abdominal cramping and bloating",icon:"😣",next:"dig2",s:{ibs:10,gastroenteritis:4,gerd:2}},
+      {t:"Severe abdominal pain — especially lower right",icon:"⚠️",next:"dig2",s:{appendicitis:12,peptic_ulcer:4,kidney_stones:3}},
+      {t:"Stomach pain that wakes me at night or between meals",icon:"🌙",next:"dig2",s:{peptic_ulcer:12,gerd:5}}
+    ]
+  },
+  dig2:{
+    text:"Which of these additional details best applies?",
+    opts:[
+      {t:"Pain is temporarily relieved by eating or antacids",icon:"💊",next:"dig3",s:{peptic_ulcer:8,gerd:6}},
+      {t:"Pain worsens when lying down, bending, or after large meals",icon:"🛌",next:"dig3",s:{gerd:10,peptic_ulcer:3}},
+      {t:"Symptoms are strongly triggered or worsened by stress",icon:"😰",next:"dig3",s:{ibs:10,gerd:3}},
+      {t:"Sudden illness — possibly multiple people affected",icon:"👥",next:"dig3",s:{gastroenteritis:12}},
+      {t:"Pain started near the navel then shifted to lower right",icon:"📍",next:"dig3",s:{appendicitis:15}}
+    ]
+  },
+  dig3:{
+    text:"How long have you had these digestive symptoms?",
+    opts:[
+      {t:"Started within the last 24–48 hours",icon:"⏰",next:"fever",s:{gastroenteritis:6,appendicitis:5}},
+      {t:"A few days to 2 weeks",icon:"📅",next:"fever",s:{gerd:3,peptic_ulcer:4,ibs:3}},
+      {t:"Weeks to months",icon:"🗓️",next:"fever",s:{ibs:8,gerd:6,peptic_ulcer:5}},
+      {t:"Years — recurring episodes or chronic condition",icon:"♾️",next:"fever",s:{ibs:10,gerd:8}}
+    ]
+  },
+  // URINARY
+  uri1:{
+    text:"What are your urinary symptoms?",
+    opts:[
+      {t:"Burning or pain when urinating",icon:"🔥",next:"uri2",s:{uti:12,kidney_stones:5}},
+      {t:"Frequent urge to urinate, often producing little urine",icon:"🚽",next:"uri2",s:{uti:10,diabetes:5}},
+      {t:"Severe flank or back pain with blood in the urine",icon:"🩸",next:"uri2",s:{kidney_stones:12,uti:4}},
+      {t:"Excessive thirst AND very frequent urination",icon:"💧",next:"uri2",s:{diabetes:12}}
+    ]
+  },
+  uri2:{
+    text:"Do you have any of these additional symptoms?",
+    opts:[
+      {t:"Cloudy, dark, or foul-smelling urine",icon:"💛",next:"fever",s:{uti:8}},
+      {t:"Severe, wave-like pain in back or side (comes and goes)",icon:"🌊",next:"fever",s:{kidney_stones:12,uti:2}},
+      {t:"Fever with pain in the back or kidney area",icon:"🌡️",next:"fever",s:{uti:6,kidney_stones:4,fever_general:5}},
+      {t:"Fatigue, blurred vision, slow-healing wounds",icon:"😴",next:"fever",s:{diabetes:10,anemia:4}}
+    ]
+  },
+  // SKIN
+  skin1:{
+    text:"How would you describe your skin problem?",
+    opts:[
+      {t:"Dry, itchy, inflamed patches — chronic or recurring",icon:"🔴",next:"skin2",s:{eczema:10,psoriasis:6,contact_dermatitis:4}},
+      {t:"Rash that appeared where a substance touched my skin",icon:"✋",next:"skin2",s:{contact_dermatitis:12,hives:4}},
+      {t:"Raised, red, itchy welts appearing and disappearing",icon:"🔵",next:"skin2",s:{hives:12,contact_dermatitis:3}},
+      {t:"Thick, scaly, silvery patches",icon:"⚪",next:"skin2",s:{psoriasis:12,eczema:4}}
+    ]
+  },
+  skin2:{
+    text:"Where is the skin problem most prominent?",
+    opts:[
+      {t:"Elbow creases, knee backs, neck, or wrists",icon:"💪",next:"skin3",s:{eczema:8,psoriasis:4}},
+      {t:"Precisely where I touched something (localized)",icon:"📍",next:"skin3",s:{contact_dermatitis:10}},
+      {t:"Widespread — can appear anywhere on the body",icon:"🗺️",next:"skin3",s:{hives:8,psoriasis:4}},
+      {t:"Scalp, elbows, knees, lower back, and/or nails",icon:"💅",next:"skin3",s:{psoriasis:10,eczema:3}}
+    ]
+  },
+  skin3:{
+    text:"Do you know what triggers or worsens your skin symptoms?",
+    opts:[
+      {t:"Allergens — pollen, pets, dust, or certain foods",icon:"🌿",next:"dur",s:{eczema:5,hives:5,allergic_rhinitis:3}},
+      {t:"Contact with a specific substance (soap, jewelry, plant, rubber)",icon:"🧴",next:"dur",s:{contact_dermatitis:10}},
+      {t:"A food, medication, or the trigger is unknown",icon:"🍽️",next:"dur",s:{hives:8,contact_dermatitis:3}},
+      {t:"Stress, cold/dry weather, or no clear trigger",icon:"❄️",next:"dur",s:{psoriasis:6,eczema:5}}
+    ]
+  },
+  // MUSCULOSKELETAL
+  msk1:{
+    text:"What best describes your muscle or joint issue?",
+    opts:[
+      {t:"Pain after exercise, lifting, or a sudden movement",icon:"💪",next:"msk2",s:{muscle_strain:12,lower_back:5}},
+      {t:"Joint pain with stiffness, especially in the morning",icon:"🦴",next:"msk2",s:{arthritis:10,gout:5}},
+      {t:"Sudden, severe joint pain — especially the big toe, ankle, or knee",icon:"⚡",next:"msk2",s:{gout:12,arthritis:3}},
+      {t:"Lower back pain — dull ache or sharp",icon:"🔙",next:"msk2",s:{lower_back:12,muscle_strain:5}},
+      {t:"Widespread muscle pain or deep fatigue",icon:"😩",next:"msk2",s:{muscle_strain:5,influenza:5,anemia:4,fever_general:3}}
+    ]
+  },
+  msk2:{
+    text:"Where is the pain located?",
+    opts:[
+      {t:"Lower back",icon:"🔙",next:"msk3",s:{lower_back:8,muscle_strain:4}},
+      {t:"Knee(s) or hip(s)",icon:"🦵",next:"msk3",s:{arthritis:8,muscle_strain:4,gout:3}},
+      {t:"Big toe, foot, or ankle",icon:"🦶",next:"msk3",s:{gout:10,arthritis:4}},
+      {t:"Shoulder, neck, or upper back",icon:"🤷",next:"msk3",s:{muscle_strain:8,tension_ha:4}},
+      {t:"Hands, wrists, or fingers",icon:"🤲",next:"msk3",s:{arthritis:8,gout:3}}
+    ]
+  },
+  msk3:{
+    text:"How does physical activity affect your pain?",
+    opts:[
+      {t:"Pain loosens up and improves with movement",icon:"🔆",next:"fever",s:{arthritis:6}},
+      {t:"Pain worsens with activity and is better with rest",icon:"🌙",next:"fever",s:{muscle_strain:7,lower_back:5,gout:4}},
+      {t:"Pain is fairly constant regardless of activity",icon:"⚠️",next:"fever",s:{lower_back:5,arthritis:4}},
+      {t:"Came on suddenly and is extremely severe",icon:"⚡",next:"fever",s:{gout:8,muscle_strain:6,kidney_stones:4}}
+    ]
+  },
+  // MENTAL HEALTH
+  mh1:{
+    text:"Which mental health concern is most affecting you?",
+    opts:[
+      {t:"Excessive or uncontrollable worry and fear",icon:"😰",next:"mh2",s:{anxiety:12,panic_disorder:5}},
+      {t:"Persistent sadness, hopelessness, or loss of interest",icon:"😔",next:"mh2",s:{depression:12,anxiety:3}},
+      {t:"Sudden episodes of intense fear — racing heart, can't breathe",icon:"💓",next:"mh2",s:{panic_disorder:12,anxiety:5}},
+      {t:"Difficulty sleeping, chronic fatigue, or very poor sleep quality",icon:"😴",next:"mh2",s:{insomnia:12,depression:5,anxiety:4}}
+    ]
+  },
+  mh2:{
+    text:"Do you also experience any of these physical symptoms?",
+    opts:[
+      {t:"Racing heart, shortness of breath, or sweating with anxiety",icon:"💗",next:"mh3",s:{panic_disorder:8,anxiety:6}},
+      {t:"Persistent fatigue and significant changes in appetite or weight",icon:"⚖️",next:"mh3",s:{depression:8,anxiety:3}},
+      {t:"Muscle tension, headaches, and stomach upset",icon:"😣",next:"mh3",s:{anxiety:8,depression:4}},
+      {t:"Mostly emotional or cognitive symptoms — not many physical ones",icon:"🧠",next:"mh3",s:{depression:6,anxiety:5,insomnia:3}}
+    ]
+  },
+  mh3:{
+    text:"How long have you been experiencing these symptoms?",
+    opts:[
+      {t:"Less than 2 weeks",icon:"📅",next:"dur",s:{anxiety:3,depression:2,insomnia:2}},
+      {t:"2 weeks to a few months",icon:"🗓️",next:"dur",s:{anxiety:5,depression:5,panic_disorder:4}},
+      {t:"Several months to over a year",icon:"📆",next:"dur",s:{anxiety:7,depression:7,insomnia:6}},
+      {t:"Most of my life — longstanding pattern",icon:"♾️",next:"dur",s:{anxiety:8,depression:8,insomnia:7}}
+    ]
+  },
+  // GENERAL
+  gen1:{
+    text:"What general symptom concerns you most?",
+    opts:[
+      {t:"Fever with general feeling of illness",icon:"🌡️",next:"gen2",s:{fever_general:12,influenza:7,covid19:6}},
+      {t:"Persistent, unexplained fatigue and very low energy",icon:"😩",next:"gen2",s:{anemia:8,depression:6,diabetes:5,influenza:4}},
+      {t:"Unexplained weight change (loss or gain)",icon:"⚖️",next:"gen2",s:{diabetes:8,depression:5,anemia:3}},
+      {t:"Excessive thirst and very frequent urination",icon:"💧",next:"gen2",s:{diabetes:14}},
+      {t:"Pale skin, breathlessness, and dizziness",icon:"😰",next:"gen2",s:{anemia:14}}
+    ]
+  },
+  gen2:{
+    text:"Do you also have any of these symptoms?",
+    opts:[
+      {t:"Chills, body aches, and sweating",icon:"❄️",next:"fever",s:{influenza:8,fever_general:8,covid19:6}},
+      {t:"Loss of taste or smell",icon:"👃",next:"fever",s:{covid19:10}},
+      {t:"Tingling in hands/feet, blurred vision, or very slow healing",icon:"👋",next:"fever",s:{diabetes:10}},
+      {t:"None of the above",icon:"❌",next:"fever",s:{anemia:3,fever_general:3}}
+    ]
+  },
+  // SHARED
+  fever:{
+    text:"Do you currently have a fever?",
+    opts:[
+      {t:"Yes — high fever (above 102°F / 39°C)",icon:"🔥",next:"dur",s:{influenza:6,fever_general:8,covid19:5,strep:5}},
+      {t:"Yes — mild or low-grade fever",icon:"🌡️",next:"dur",s:{common_cold:4,covid19:4,fever_general:4,uti:3}},
+      {t:"No fever",icon:"👍",next:"dur",s:{tension_ha:2,allergic_rhinitis:3,ibs:2,anxiety:2}},
+      {t:"I haven't checked / not sure",icon:"❓",next:"dur",s:{}}
+    ]
+  },
+  dur:{
+    text:"How long have you been experiencing these symptoms?",
+    opts:[
+      {t:"Less than 24 hours",icon:"⏰",next:"sev",s:{appendicitis:4,kidney_stones:3,gastroenteritis:4,gout:4}},
+      {t:"1–3 days",icon:"📅",next:"sev",s:{influenza:4,common_cold:4,strep:4,covid19:4}},
+      {t:"4–14 days",icon:"🗓️",next:"sev",s:{common_cold:3,bronchitis:5,covid19:3}},
+      {t:"More than 2 weeks",icon:"📆",next:"sev",s:{ibs:4,gerd:4,arthritis:4,anxiety:4,depression:4,lower_back:4}},
+      {t:"Months to years — chronic condition",icon:"♾️",next:"sev",s:{ibs:7,gerd:6,arthritis:6,anxiety:5,depression:5,hypertension:4}}
+    ]
+  },
+  sev:{
+    text:"How severe are your symptoms overall?",
+    opts:[
+      {t:"Mild — manageable, not really affecting my day",icon:"😊",next:"RESULTS",s:{common_cold:3,tension_ha:3,allergic_rhinitis:3}},
+      {t:"Moderate — noticeably affecting my daily activities",icon:"😐",next:"RESULTS",s:{influenza:3,ibs:3,anxiety:3,depression:3,migraine:3}},
+      {t:"Severe — significantly limiting what I can do",icon:"😣",next:"RESULTS",s:{influenza:5,migraine:5,kidney_stones:5,gout:5}},
+      {t:"Very severe — nearly debilitating",icon:"😱",next:"RESULTS",s:{appendicitis:5,kidney_stones:7,migraine:6,influenza:5}}
+    ]
+  }
+};
+
+// ═══════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════
+let state = {
+  screen: 'welcome', // welcome | quiz | results
+  history: [],       // [{qid, optIdx, scores}]
+  scores: {},
+  totalSteps: 10
+};
+
+function resetState(){
+  state = {screen:'welcome',history:[],scores:{},totalSteps:10};
+}
+
+function addScores(s){
+  for(const [k,v] of Object.entries(s)){
+    state.scores[k] = (state.scores[k]||0)+v;
+  }
+}
+
+function removeScores(s){
+  for(const [k,v] of Object.entries(s)){
+    state.scores[k] = (state.scores[k]||0)-v;
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════
+function render(){
+  const app = document.getElementById('app');
+  if(state.screen==='welcome') app.innerHTML = renderWelcome();
+  else if(state.screen==='quiz') app.innerHTML = renderQuiz();
+  else app.innerHTML = renderResults();
+  app.className = 'fade-in';
+}
+
+function renderWelcome(){
+  return `
+  <div class="card welcome">
+    <div class="w-icon">🩺</div>
+    <div class="w-title">Check Your Symptoms</div>
+    <p class="w-desc">Answer a series of questions about your symptoms and receive a list of possible conditions with detailed information about symptoms, causes, and treatment options.</p>
+    <div class="features">
+      <div class="feat"><div class="fi">📋</div><div class="fl">Multiple-choice questions</div></div>
+      <div class="feat"><div class="fi">🔍</div><div class="fl">30+ conditions covered</div></div>
+      <div class="feat"><div class="fi">💊</div><div class="fl">Treatment information</div></div>
+    </div>
+    <button class="btn-start" onclick="startQuiz()">Start Symptom Check →</button>
+  </div>`;
+}
+
+function renderQuiz(){
+  const entry = state.history[state.history.length-1];
+  const qid = entry ? entry.next : 'start';
+  const q = QUESTIONS[qid];
+  const stepNum = state.history.length+1;
+  const pct = Math.min(Math.round((state.history.length/state.totalSteps)*100),95);
+  const letters = 'ABCDE';
+
+  return `
+  <div class="progress-wrap">
+    <div class="progress-meta"><span>Progress</span><span>Step ${stepNum}</span></div>
+    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+  </div>
+  <div class="card">
+    <div class="q-label">Question ${stepNum}</div>
+    <div class="q-text">${q.text}${q.sub?`<div class="q-sub">${q.sub}</div>`:''}</div>
+    <div class="options" id="opts">
+      ${q.opts.map((o,i)=>`
+        <button class="opt" onclick="selectOpt(${i})" id="opt${i}">
+          <span class="opt-icon">${o.icon}</span>
+          <span class="opt-letter">${letters[i]}</span>
+          <span><strong>${o.t}</strong>${o.sub?`<br><small style="color:var(--muted)">${o.sub}</small>`:''}</span>
+        </button>`).join('')}
+    </div>
+    <div class="nav">
+      <button class="btn-back" onclick="goBack()" ${state.history.length===0?'disabled':''}>← Back</button>
+      <button class="btn-next" id="btn-next" disabled onclick="advance()">Continue →</button>
+    </div>
+  </div>`;
+}
+
+let pendingOpt = null;
+
+function selectOpt(i){
+  pendingOpt = i;
+  document.querySelectorAll('.opt').forEach((el,idx)=>{
+    el.classList.toggle('selected',idx===i);
+  });
+  const nb = document.getElementById('btn-next');
+  if(nb) nb.disabled = false;
+}
+
+function advance(){
+  if(pendingOpt===null) return;
+  const entry = state.history[state.history.length-1];
+  const qid = entry ? entry.next : 'start';
+  const q = QUESTIONS[qid];
+  const opt = q.opts[pendingOpt];
+  addScores(opt.s);
+  state.history.push({qid, optIdx:pendingOpt, next:opt.next, scores:opt.s});
+  pendingOpt = null;
+  if(opt.next==='RESULTS'){
+    state.screen='results';
+  }
+  render();
+}
+
+function goBack(){
+  if(state.history.length===0) return;
+  const last = state.history.pop();
+  removeScores(last.scores);
+  pendingOpt = null;
+  render();
+}
+
+function startQuiz(){
+  state.screen='quiz';
+  render();
+}
+
+// ═══════════════════════════════════════════════════
+// RESULTS
+// ═══════════════════════════════════════════════════
+function renderResults(){
+  const ranked = Object.entries(state.scores)
+    .filter(([,v])=>v>0)
+    .sort(([,a],[,b])=>b-a)
+    .slice(0,3);
+
+  if(ranked.length===0){
+    return `<div class="card" style="text-align:center;padding:2.5rem">
+      <div style="font-size:2rem;margin-bottom:1rem">🤔</div>
+      <h2>No Clear Match</h2>
+      <p style="color:var(--muted);margin-top:.75rem">Based on your answers, we couldn't identify a likely condition. Please consult a healthcare provider for proper evaluation.</p>
+      <button class="btn-restart" onclick="restart()">Start Over</button></div>`;
+  }
+
+  const maxScore = ranked[0][1];
+  const hasEmergency = ranked.some(([k])=>CONDITIONS[k]&&CONDITIONS[k].urgency==='high');
+
+  const ranks = ['Most Likely','Also Possible','Also Consider'];
+  const rankClasses = ['r1','r2','r3'];
+
+  let html = `
+  <div class="res-header">
+    <div class="res-icon">📋</div>
+    <div class="res-title">Your Results</div>
+    <p class="res-sub">Based on your symptoms, here are the most likely conditions. These results are for educational purposes only and are not a diagnosis.</p>
+  </div>`;
+
+  if(hasEmergency){
+    html += `<div class="emergency-banner">🚨 One or more possible conditions below may require emergency medical attention. Please seek care immediately if symptoms are severe.</div>`;
+  }
+
+  ranked.forEach(([cid, score], idx)=>{
+    const c = CONDITIONS[cid];
+    if(!c) return;
+    const pct = Math.round((score/maxScore)*100);
+    const barClass = pct>=70?'mhigh':pct>=40?'mmed':'mlow';
+    const urgClass = c.urgency==='high'?'u-high':c.urgency==='mod'?'u-mod':'u-low';
+    const urgLabel = c.urgency==='high'?'⚠️ Seek Medical Care Soon':c.urgency==='mod'?'🩺 See a Doctor':'ℹ️ Generally Not Urgent';
+
+    html += `
+    <div class="res-card ${idx===0?'top':''}">
+      <div class="res-card-header">
+        <div>
+          <div class="res-cat">${c.cat}</div>
+          <div class="res-name">${c.name}</div>
+        </div>
+        <div style="text-align:right">
+          <div class="rank-pill ${rankClasses[idx]}">${ranks[idx]}</div>
+          <div class="match-pct" style="margin-top:.25rem">${pct}% match</div>
+        </div>
+      </div>
+      <div class="match-bar-wrap"><div class="match-bar-fill ${barClass}" style="width:${pct}%"></div></div>
+      <div class="res-desc">${c.desc}</div>
+
+      <div class="sec-label" onclick="toggleSection('sym${idx}')" id="lbl-sym${idx}">
+        <svg width="8" height="12" viewBox="0 0 8 12"><path d="M1 1l6 5-6 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+        Common Symptoms
+      </div>
+      <div class="list-panel" id="sym${idx}">
+        <div class="list">${c.symptoms.map(s=>`<div class="list-item sym">${s}</div>`).join('')}</div>
+      </div>
+
+      <div class="sec-label" onclick="toggleSection('trt${idx}')" id="lbl-trt${idx}">
+        <svg width="8" height="12" viewBox="0 0 8 12"><path d="M1 1l6 5-6 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+        Treatment Options
+      </div>
+      <div class="list-panel" id="trt${idx}">
+        <div class="list">${c.treatments.map(t=>`<div class="list-item trt">${t}</div>`).join('')}</div>
+      </div>
+
+      <div>
+        <div class="urgency ${urgClass}">${urgLabel}</div>
+        <div class="u-note">${c.urgencyNote}</div>
+      </div>
+    </div>`;
+  });
+
+  // Auto-expand the top result's sections
+  html += `
+  <div class="res-disclaimer">
+    <strong>Disclaimer:</strong> This symptom checker is for general educational information only. It is <strong>not a substitute for professional medical advice, diagnosis, or treatment</strong>. The results are based on limited information and may not accurately reflect your condition. Always consult a qualified healthcare professional for any health concerns. If you believe you are experiencing a medical emergency, <strong>call 911 immediately</strong>.
+  </div>
+  <button class="btn-restart" onclick="restart()">← Check Different Symptoms</button>`;
+
+  return html;
+}
+
+function toggleSection(id){
+  const panel = document.getElementById(id);
+  const lbl = document.getElementById('lbl-'+id);
+  if(!panel) return;
+  panel.classList.toggle('open');
+  lbl.classList.toggle('open');
+}
+
+function restart(){
+  resetState();
+  render();
+}
+
+// Auto-expand first result sections after render
+const _origRender = render;
+function render(){
+  const app = document.getElementById('app');
+  if(state.screen==='welcome') app.innerHTML = renderWelcome();
+  else if(state.screen==='quiz') app.innerHTML = renderQuiz();
+  else {
+    app.innerHTML = renderResults();
+    // Auto-expand top result
+    setTimeout(()=>{
+      ['sym0','trt0'].forEach(id=>{
+        const p = document.getElementById(id);
+        const l = document.getElementById('lbl-'+id);
+        if(p){p.classList.add('open');if(l)l.classList.add('open');}
+      });
+    },50);
+  }
+  app.className = 'fade-in';
+}
+
+render();
+</script>
+</body>
+</html>
