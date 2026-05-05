@@ -13,7 +13,7 @@ Qurest is a browser-based symptom checker prototype with a dark, conversation-fi
 
 ## How It Works
 
-- The app is currently a single-page front-end prototype in `symptom-checker.html`.
+- The app is currently a single-page front-end prototype in `index.html`, with `symptom-checker.html` kept as a compatibility redirect.
 - It uses plain HTML, CSS, and JavaScript, with no backend or database.
 - The intake console imports WebLLM from a CDN and runs inference in the browser with WebGPU when supported. The first model load downloads model assets; subsequent loads can use the browser cache.
 - The UI treats the LLM as a routing helper, not as the medical authority. The weighted question tree remains the source for scoring and results.
@@ -49,9 +49,18 @@ python3 -m http.server
 
 The answer-chip flow still works if WebGPU is unavailable or the model cannot load.
 
-You can also open `symptom-checker.html` directly for the non-AI path.
+You can also open `index.html` directly for the non-AI path.
+
+## GitHub Pages
+
+This repo is ready to publish from the root of the `main` branch. Once GitHub Pages is enabled, the app will be available at:
+
+```text
+https://aditano.github.io/Qurest/
+```
 
 ## Project Structure
 
-- `symptom-checker.html` - the full prototype UI, question tree, condition data, scoring logic, and results rendering
+- `index.html` - the full prototype UI, question tree, condition data, scoring logic, and results rendering
+- `symptom-checker.html` - compatibility redirect to the Pages-friendly root path
 - `README.md` - project overview and usage notes
