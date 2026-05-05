@@ -4,118 +4,175 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Symptom Checker</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563eb'/%3E%3Cpath d='M32 12v40M18 28h28' stroke='white' stroke-width='7' stroke-linecap='round'/%3E%3C/svg%3E">
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     :root{
-      --primary:#2563eb;--primary-dark:#1d4ed8;--primary-light:#eff6ff;
-      --success:#10b981;--warning:#f59e0b;--danger:#ef4444;
-      --text:#1e293b;--muted:#64748b;--border:#e2e8f0;
-      --bg:#f1f5f9;--white:#ffffff;
-      --shadow:0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -1px rgba(0,0,0,.06);
+      --bg:#02040a;--panel:#080b12;--panel-2:#0d111b;--panel-3:#121826;
+      --line:#222a3a;--line-strong:#334156;--text:#f6f8fb;--muted:#93a0b4;
+      --soft:#c7d2e3;--accent:#7dd3fc;--accent-2:#a7f3d0;--warning:#fbbf24;
+      --danger:#fb7185;--success:#34d399;--shadow:0 24px 80px rgba(0,0,0,.48);
     }
-    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-    header{background:var(--white);border-bottom:1px solid var(--border);padding:1rem 1.5rem;display:flex;align-items:center;gap:.75rem;position:sticky;top:0;z-index:10}
-    .logo{width:38px;height:38px;background:linear-gradient(135deg,#2563eb,#7c3aed);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.1rem;flex-shrink:0}
-    .header-text h1{font-size:1.1rem;font-weight:700}
+    body{
+      min-height:100vh;color:var(--text);
+      font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+      background-color:var(--bg);
+      background-image:
+        radial-gradient(circle at 12% 18%,rgba(255,255,255,.42) 0 1px,transparent 1.5px),
+        radial-gradient(circle at 76% 8%,rgba(125,211,252,.38) 0 1px,transparent 1.6px),
+        radial-gradient(circle at 84% 62%,rgba(255,255,255,.24) 0 1px,transparent 1.4px),
+        radial-gradient(circle at 28% 76%,rgba(167,243,208,.26) 0 1px,transparent 1.4px),
+        linear-gradient(180deg,#02040a 0%,#050711 54%,#02040a 100%);
+      background-size:220px 220px,340px 340px,260px 260px,300px 300px,100% 100%;
+      letter-spacing:0;
+    }
+    body::before{
+      content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;
+      background:
+        linear-gradient(90deg,rgba(125,211,252,.08) 1px,transparent 1px),
+        linear-gradient(180deg,rgba(255,255,255,.045) 1px,transparent 1px);
+      background-size:72px 72px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.8),transparent 72%);
+    }
+    header{
+      position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;
+      gap:1rem;padding:1rem 1.5rem;border-bottom:1px solid rgba(255,255,255,.08);
+      background:rgba(2,4,10,.82);backdrop-filter:blur(18px);
+    }
+    .brand{display:flex;align-items:center;gap:.75rem}
+    .logo{
+      width:38px;height:38px;border:1px solid rgba(125,211,252,.45);border-radius:10px;
+      display:flex;align-items:center;justify-content:center;color:var(--text);
+      background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.04));
+      font-weight:900;box-shadow:0 0 28px rgba(125,211,252,.16);
+    }
+    .header-text h1{font-size:1.05rem;font-weight:800}
     .header-text p{font-size:.75rem;color:var(--muted)}
-    .container{max-width:680px;margin:0 auto;padding:2rem 1.25rem}
-    /* DISCLAIMER */
-    .disclaimer{background:#fef3c7;border:1px solid #fde68a;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.75rem;display:flex;gap:.75rem;font-size:.8125rem;color:#92400e;line-height:1.5}
-    .disclaimer .di{font-size:1rem;flex-shrink:0;margin-top:1px}
-    /* PROGRESS */
-    .progress-wrap{margin-bottom:1.5rem}
-    .progress-meta{display:flex;justify-content:space-between;font-size:.8125rem;margin-bottom:.4rem;color:var(--muted)}
-    .progress-meta span:last-child{color:var(--primary);font-weight:600}
-    .progress-bar{height:6px;background:var(--border);border-radius:99px;overflow:hidden}
-    .progress-fill{height:100%;background:var(--primary);border-radius:99px;transition:width .4s ease}
-    /* CARD */
-    .card{background:var(--white);border-radius:16px;padding:1.75rem;box-shadow:var(--shadow);border:1px solid var(--border)}
-    .q-label{font-size:.7rem;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.6rem}
-    .q-text{font-size:1.2rem;font-weight:700;line-height:1.4;margin-bottom:1.5rem}
-    .q-sub{font-size:.875rem;color:var(--muted);margin-top:.35rem;font-weight:400}
-    .options{display:flex;flex-direction:column;gap:.625rem}
-    .opt{display:flex;align-items:center;gap:.875rem;padding:.875rem 1rem;background:var(--bg);border:2px solid var(--border);border-radius:12px;cursor:pointer;text-align:left;width:100%;font-size:.9rem;color:var(--text);line-height:1.4;transition:border-color .15s,background .15s,color .15s}
-    .opt:hover{border-color:var(--primary);background:var(--primary-light);color:var(--primary)}
-    .opt.selected{border-color:var(--primary);background:var(--primary-light);color:var(--primary)}
-    .opt-icon{font-size:1.2rem;flex-shrink:0;width:28px;text-align:center}
-    .opt-letter{display:flex;align-items:center;justify-content:center;width:26px;height:26px;background:var(--border);border-radius:7px;font-size:.7rem;font-weight:700;flex-shrink:0;transition:background .15s,color .15s}
-    .opt:hover .opt-letter,.opt.selected .opt-letter{background:var(--primary);color:#fff}
-    /* NAV */
-    .nav{display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem}
-    .btn-back{padding:.55rem 1.1rem;background:transparent;border:1px solid var(--border);border-radius:8px;cursor:pointer;color:var(--muted);font-size:.875rem;font-weight:500;transition:all .15s}
-    .btn-back:hover{background:var(--bg);color:var(--text)}
-    .btn-next{padding:.7rem 1.75rem;background:var(--primary);border:none;border-radius:10px;cursor:pointer;color:#fff;font-size:.9375rem;font-weight:600;transition:all .2s;display:flex;align-items:center;gap:.5rem}
-    .btn-next:hover:not(:disabled){background:var(--primary-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,.3)}
-    .btn-next:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;transform:none;box-shadow:none}
-    /* WELCOME */
-    .welcome{text-align:center;padding:2rem 1rem}
-    .w-icon{font-size:3.5rem;margin-bottom:1rem}
-    .w-title{font-size:1.75rem;font-weight:800;margin-bottom:.75rem}
-    .w-desc{font-size:1rem;color:var(--muted);line-height:1.6;max-width:480px;margin:0 auto 2rem}
-    .features{display:grid;grid-template-columns:repeat(3,1fr);gap:.875rem;margin-bottom:2rem;max-width:480px;margin:0 auto 2rem}
-    .feat{padding:.875rem;background:var(--bg);border-radius:12px;text-align:center}
-    .feat .fi{font-size:1.5rem;margin-bottom:.375rem}
-    .feat .fl{font-size:.75rem;color:var(--muted);font-weight:500;line-height:1.3}
-    .btn-start{padding:1rem 2.75rem;background:var(--primary);color:#fff;border:none;border-radius:12px;font-size:1.0625rem;font-weight:700;cursor:pointer;transition:all .2s}
-    .btn-start:hover{background:var(--primary-dark);transform:translateY(-2px);box-shadow:0 8px 20px rgba(37,99,235,.3)}
-    /* RESULTS */
-    .res-header{text-align:center;margin-bottom:2rem}
-    .res-icon{width:60px;height:60px;background:var(--primary-light);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.75rem;margin:0 auto 1rem}
-    .res-title{font-size:1.4rem;font-weight:800;margin-bottom:.5rem}
-    .res-sub{font-size:.9rem;color:var(--muted);line-height:1.5}
-    .res-card{background:var(--white);border-radius:16px;padding:1.5rem;margin-bottom:1rem;box-shadow:var(--shadow);border:1px solid var(--border);transition:border-color .2s}
-    .res-card.top{border-color:var(--primary);border-width:2px}
-    .res-card-header{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;margin-bottom:.5rem}
-    .rank-pill{padding:.2rem .7rem;border-radius:99px;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
-    .r1{background:#fef3c7;color:#92400e}
-    .r2{background:#f1f5f9;color:#475569}
-    .r3{background:#f1f5f9;color:#64748b}
-    .match-pct{font-size:.8rem;color:var(--muted);white-space:nowrap}
-    .res-name{font-size:1.1rem;font-weight:700;margin-bottom:.25rem}
-    .res-cat{font-size:.75rem;color:var(--primary);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem}
-    .match-bar-wrap{height:4px;background:var(--border);border-radius:99px;overflow:hidden;margin-bottom:1rem}
-    .match-bar-fill{height:100%;border-radius:99px}
-    .mhigh{background:var(--primary)}
-    .mmed{background:var(--warning)}
-    .mlow{background:#cbd5e1}
-    .res-desc{font-size:.8625rem;color:var(--muted);line-height:1.55;margin-bottom:1rem}
-    .collapsible{cursor:pointer;border:none;background:none;padding:0;width:100%;text-align:left}
-    .sec-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem;cursor:pointer;user-select:none}
-    .sec-label svg{transition:transform .2s;flex-shrink:0}
-    .sec-label.open svg{transform:rotate(90deg)}
-    .list-panel{display:none}
-    .list-panel.open{display:block}
-    .list{display:flex;flex-direction:column;gap:.35rem;margin-bottom:1rem}
-    .list-item{display:flex;align-items:flex-start;gap:.5rem;font-size:.85rem;line-height:1.4}
-    .list-item.sym::before{content:"•";color:var(--primary);font-weight:900;flex-shrink:0;margin-top:1px}
-    .list-item.trt::before{content:"✓";color:var(--success);font-weight:900;flex-shrink:0;margin-top:1px}
-    .urgency{display:inline-flex;align-items:center;gap:.375rem;padding:.35rem .75rem;border-radius:8px;font-size:.78rem;font-weight:600;margin-top:.25rem}
-    .u-low{background:#d1fae5;color:#065f46}
-    .u-mod{background:#fef3c7;color:#92400e}
-    .u-high{background:#fee2e2;color:#991b1b}
-    .u-note{font-size:.78rem;color:var(--muted);margin-top:.5rem;line-height:1.45;padding:.5rem .75rem;background:var(--bg);border-radius:8px;border-left:3px solid var(--border)}
-    .res-disclaimer{background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:1.25rem;margin-top:1.5rem;font-size:.8rem;color:var(--muted);line-height:1.6}
-    .btn-restart{display:block;width:100%;padding:.875rem;background:var(--primary);color:#fff;border:none;border-radius:12px;font-size:1rem;font-weight:700;cursor:pointer;margin-top:1.25rem;transition:all .2s}
-    .btn-restart:hover{background:var(--primary-dark);transform:translateY(-1px)}
-    .fade-in{animation:fi .3s ease}
+    .system-pill{
+      display:inline-flex;align-items:center;gap:.45rem;border:1px solid rgba(255,255,255,.12);
+      border-radius:999px;padding:.45rem .7rem;color:var(--soft);font-size:.78rem;background:rgba(8,11,18,.72);
+      max-width:42vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    }
+    .system-pill span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .dot{width:8px;height:8px;border-radius:50%;background:var(--muted);box-shadow:0 0 18px currentColor;flex-shrink:0}
+    .dot.ready{background:var(--success);color:var(--success)}
+    .dot.loading{background:var(--warning);color:var(--warning)}
+    .dot.error{background:var(--danger);color:var(--danger)}
+    .container{max-width:1040px;margin:0 auto;padding:2rem 1.25rem 3rem}
+    .disclaimer{
+      display:flex;align-items:flex-start;gap:.75rem;margin-bottom:1rem;padding:.8rem .95rem;
+      border:1px solid rgba(251,191,36,.26);border-radius:10px;color:#fde68a;
+      background:rgba(120,73,10,.18);font-size:.8rem;line-height:1.5;
+    }
+    .disclaimer .di{width:18px;height:18px;border-radius:50%;border:1px solid rgba(251,191,36,.52);display:flex;align-items:center;justify-content:center;font-size:.72rem;flex-shrink:0;margin-top:1px}
+    .workspace{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:1rem;align-items:start}
+    .console,.side-panel,.res-card,.card{
+      border:1px solid rgba(255,255,255,.1);background:rgba(8,11,18,.82);
+      box-shadow:var(--shadow);backdrop-filter:blur(18px);
+    }
+    .console{border-radius:14px;overflow:hidden}
+    .console-head{padding:1rem 1.1rem;border-bottom:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;gap:1rem;align-items:flex-start;background:rgba(255,255,255,.025)}
+    .kicker{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:800;margin-bottom:.38rem}
+    .console-title{font-size:1.5rem;line-height:1.1;font-weight:850}
+    .console-copy{color:var(--muted);font-size:.9rem;line-height:1.55;margin-top:.55rem;max-width:620px}
+    .progress-chip{min-width:112px;text-align:right;color:var(--muted);font-size:.8rem;font-weight:700}
+    .progress-bar{height:4px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin-top:.55rem}
+    .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));border-radius:999px;transition:width .35s ease}
+    .chat-stream{padding:1.1rem;display:flex;flex-direction:column;gap:.8rem}
+    .message{display:flex;gap:.75rem;align-items:flex-start}
+    .avatar{width:30px;height:30px;border-radius:9px;border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:850;color:var(--text);background:rgba(255,255,255,.06);flex-shrink:0}
+    .bubble{max-width:780px;border:1px solid rgba(255,255,255,.09);border-radius:12px;padding:.85rem .95rem;background:rgba(255,255,255,.045);line-height:1.5}
+    .bubble.user{margin-left:auto;background:rgba(125,211,252,.09);border-color:rgba(125,211,252,.25)}
+    .bubble-title{font-weight:800;margin-bottom:.25rem}
+    .bubble-sub{color:var(--muted);font-size:.88rem}
+    .choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;padding:0 1.1rem 1.1rem}
+    .opt{
+      min-height:74px;display:flex;align-items:flex-start;gap:.75rem;padding:.82rem .9rem;border:1px solid rgba(255,255,255,.12);
+      border-radius:10px;cursor:pointer;text-align:left;width:100%;background:rgba(255,255,255,.035);
+      color:var(--text);font-size:.9rem;line-height:1.35;transition:border-color .16s,background .16s,transform .16s;
+    }
+    .opt:hover{border-color:rgba(125,211,252,.55);background:rgba(125,211,252,.075);transform:translateY(-1px)}
+    .opt.selected{border-color:var(--accent);background:rgba(125,211,252,.13);box-shadow:0 0 0 1px rgba(125,211,252,.18) inset}
+    .opt-letter{display:flex;align-items:center;justify-content:center;width:26px;height:26px;background:rgba(255,255,255,.08);border-radius:7px;font-size:.72rem;font-weight:850;flex-shrink:0;color:var(--soft)}
+    .opt.selected .opt-letter,.opt:hover .opt-letter{background:var(--accent);color:#021018}
+    .opt small{display:block;color:var(--muted);font-size:.77rem;margin-top:.22rem;line-height:1.35}
+    .composer{border-top:1px solid rgba(255,255,255,.08);padding:1rem 1.1rem;background:rgba(255,255,255,.025)}
+    .ai-input{width:100%;min-height:92px;resize:vertical;border:1px solid rgba(255,255,255,.14);border-radius:10px;background:rgba(0,0,0,.22);color:var(--text);padding:.85rem .9rem;font:inherit;font-size:.94rem;line-height:1.45;margin-bottom:.75rem}
+    .ai-input::placeholder{color:#667085}
+    .ai-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(125,211,252,.13)}
+    .composer-actions,.nav{display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap}
+    .action-left,.action-right{display:flex;align-items:center;gap:.65rem;flex-wrap:wrap}
+    button{font:inherit;letter-spacing:0}
+    .btn-primary,.btn-secondary,.btn-link,.btn-next,.btn-back,.btn-restart{
+      border-radius:9px;cursor:pointer;font-size:.9rem;font-weight:800;transition:all .18s;
+    }
+    .btn-primary,.btn-next,.btn-restart{border:1px solid rgba(125,211,252,.65);background:var(--text);color:#02040a;padding:.72rem 1rem}
+    .btn-primary:hover:not(:disabled),.btn-next:hover:not(:disabled),.btn-restart:hover{transform:translateY(-1px);box-shadow:0 10px 30px rgba(125,211,252,.18)}
+    .btn-secondary,.btn-back{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:var(--soft);padding:.68rem .9rem}
+    .btn-secondary:hover:not(:disabled),.btn-back:hover:not(:disabled){border-color:rgba(255,255,255,.28);background:rgba(255,255,255,.08)}
+    .btn-link{border:none;background:transparent;color:var(--muted);padding:.6rem .2rem}
+    .btn-link:hover{color:var(--text)}
+    button:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+    .route-note{border:1px solid rgba(125,211,252,.2);background:rgba(125,211,252,.075);border-radius:10px;padding:.75rem .85rem;color:var(--soft);font-size:.86rem;line-height:1.5}
+    .route-note strong{color:var(--text)}
+    .danger-note{border-color:rgba(251,113,133,.35);background:rgba(127,29,29,.22);color:#fecdd3}
+    .side-panel{border-radius:14px;padding:1rem}
+    .side-label{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:850;margin-bottom:.7rem}
+    .status-row{display:flex;justify-content:space-between;gap:1rem;border-bottom:1px solid rgba(255,255,255,.08);padding:.65rem 0;color:var(--muted);font-size:.82rem}
+    .status-row strong{color:var(--soft);font-weight:800;text-align:right}
+    .path-list{display:flex;flex-direction:column;gap:.45rem;margin-top:.75rem}
+    .path-item{border:1px solid rgba(255,255,255,.08);border-radius:9px;padding:.6rem .7rem;color:var(--soft);font-size:.82rem;background:rgba(255,255,255,.035)}
+    .fade-in{animation:fi .25s ease}
     @keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-    @media(max-width:480px){.features{grid-template-columns:1fr}.container{padding:1rem}.card{padding:1.25rem}.q-text{font-size:1.05rem}}
-    .emergency-banner{background:#fee2e2;border:2px solid #fca5a5;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem;font-size:.875rem;color:#991b1b;font-weight:600;display:flex;gap:.75rem;align-items:flex-start}
+    .results-wrap{max-width:820px;margin:0 auto}
+    .res-header{text-align:left;margin-bottom:1rem}
+    .res-title{font-size:1.65rem;font-weight:850;margin-bottom:.4rem}
+    .res-sub{font-size:.92rem;color:var(--muted);line-height:1.55}
+    .res-card{border-radius:14px;padding:1.1rem;margin-bottom:.85rem}
+    .res-card.top{border-color:rgba(125,211,252,.5);box-shadow:0 0 0 1px rgba(125,211,252,.16) inset,var(--shadow)}
+    .res-card-header{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;margin-bottom:.65rem}
+    .rank-pill{padding:.24rem .62rem;border-radius:999px;font-size:.68rem;font-weight:850;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap}
+    .r1{background:rgba(125,211,252,.14);color:#bae6fd;border:1px solid rgba(125,211,252,.28)}
+    .r2,.r3{background:rgba(255,255,255,.06);color:var(--soft);border:1px solid rgba(255,255,255,.1)}
+    .match-pct{font-size:.78rem;color:var(--muted);white-space:nowrap}
+    .res-name{font-size:1.1rem;font-weight:850;margin-bottom:.25rem}
+    .res-cat{font-size:.72rem;color:var(--accent);font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.4rem}
+    .match-bar-wrap{height:4px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin-bottom:.9rem}
+    .match-bar-fill{height:100%;border-radius:999px}
+    .mhigh{background:var(--accent)}.mmed{background:var(--warning)}.mlow{background:var(--line-strong)}
+    .res-desc{font-size:.86rem;color:var(--muted);line-height:1.55;margin-bottom:.9rem}
+    .sec-label{font-size:.72rem;font-weight:850;text-transform:uppercase;letter-spacing:.08em;color:var(--soft);margin:.65rem 0 .5rem;display:flex;align-items:center;gap:.42rem;cursor:pointer;user-select:none}
+    .sec-label svg{transition:transform .2s;flex-shrink:0}.sec-label.open svg{transform:rotate(90deg)}
+    .list-panel{display:none}.list-panel.open{display:block}
+    .list{display:flex;flex-direction:column;gap:.38rem;margin-bottom:.8rem}
+    .list-item{display:flex;align-items:flex-start;gap:.5rem;font-size:.84rem;line-height:1.42;color:var(--soft)}
+    .list-item.sym::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:.5rem}
+    .list-item.trt::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--success);flex-shrink:0;margin-top:.5rem}
+    .urgency{display:inline-flex;align-items:center;gap:.375rem;padding:.36rem .68rem;border-radius:8px;font-size:.78rem;font-weight:800;margin-top:.2rem}
+    .u-low{background:rgba(52,211,153,.12);color:#bbf7d0;border:1px solid rgba(52,211,153,.25)}
+    .u-mod{background:rgba(251,191,36,.12);color:#fde68a;border:1px solid rgba(251,191,36,.28)}
+    .u-high{background:rgba(251,113,133,.14);color:#fecdd3;border:1px solid rgba(251,113,133,.32)}
+    .u-note,.res-disclaimer{font-size:.78rem;color:var(--muted);margin-top:.55rem;line-height:1.5;padding:.65rem .75rem;background:rgba(255,255,255,.04);border-radius:9px;border:1px solid rgba(255,255,255,.08)}
+    .emergency-banner{background:rgba(127,29,29,.28);border:1px solid rgba(251,113,133,.38);border-radius:10px;padding:.85rem 1rem;margin-bottom:1rem;font-size:.86rem;color:#fecdd3;font-weight:700;line-height:1.45}
+    @media(max-width:820px){header{align-items:flex-start}.workspace{grid-template-columns:1fr}.system-pill{max-width:48vw;font-size:.72rem}.choice-grid{grid-template-columns:1fr}.console-head{flex-direction:column}.progress-chip{text-align:left;width:100%}}
+    @media(max-width:520px){.container{padding:1rem .85rem 2rem}header{padding:.85rem}.console-title{font-size:1.26rem}.choice-grid,.chat-stream,.composer{padding-left:.85rem;padding-right:.85rem}.composer-actions,.nav{align-items:stretch}.action-left,.action-right,.btn-primary,.btn-secondary,.btn-next,.btn-back,.btn-restart{width:100%}.btn-primary,.btn-secondary,.btn-next,.btn-back,.btn-restart{text-align:center;justify-content:center}.res-card-header{flex-direction:column}}
   </style>
 </head>
 <body>
 
 <header>
-  <div class="logo">⚕</div>
-  <div class="header-text">
-    <h1>Symptom Checker</h1>
-    <p>Educational use only — not a substitute for medical advice</p>
+  <div class="brand">
+    <div class="logo">Q</div>
+    <div class="header-text">
+      <h1>Qurest</h1>
+      <p>Local symptom navigation</p>
+    </div>
   </div>
+  <div class="system-pill" id="system-status"><span class="dot"></span><span>Fast router ready</span></div>
 </header>
 
 <div class="container">
   <div class="disclaimer">
-    <span class="di">⚠️</span>
+    <span class="di">!</span>
     <span><strong>Important:</strong> This tool is for educational purposes only and does not provide a medical diagnosis. Always consult a qualified healthcare provider for any health concerns. If you are experiencing a medical emergency, <strong>call 911 immediately</strong>.</span>
   </div>
   <div id="app"></div>
@@ -512,6 +569,9 @@ const QUESTIONS = {
 // ═══════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════
+const LOCAL_AI_MODEL = "Llama-3.2-1B-Instruct-q4f16_1-MLC";
+const LOCAL_AI_MODEL_LABEL = "Llama 3.2 1B";
+
 let state = {
   screen: 'welcome', // welcome | quiz | results
   history: [],       // [{qid, optIdx, scores}]
@@ -519,10 +579,27 @@ let state = {
 };
 
 let pendingOpt = null;
+let localAi = {
+  loading: false,
+  ready: false,
+  error: '',
+  status: 'Local guide is off',
+  progress: 0,
+  engine: null,
+  vendor: '',
+  busy: false,
+  degraded: false,
+  suggestion: null,
+  lastInput: '',
+  warning: null
+};
 
 function resetState(){
   state = {screen:'welcome',history:[],scores:{}};
   pendingOpt = null;
+  localAi.suggestion = null;
+  localAi.lastInput = '';
+  localAi.warning = null;
 }
 
 function addScores(s){
@@ -564,19 +641,146 @@ function getOptionLabel(i){
   return i < 26 ? String.fromCharCode(65+i) : String(i+1);
 }
 
+function escapeHtml(value){
+  return String(value ?? '')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
+
+function getAiDotClass(){
+  if(localAi.degraded) return 'loading';
+  if(localAi.ready) return 'ready';
+  if(localAi.loading || localAi.busy) return 'loading';
+  if(localAi.error) return 'error';
+  return '';
+}
+
+function getAiStatusLine(){
+  if(localAi.busy) return 'Routing text';
+  if(localAi.degraded) return 'Fast router active';
+  if(localAi.ready){
+    return `${LOCAL_AI_MODEL_LABEL}${localAi.vendor ? ` · ${localAi.vendor}` : ''}`;
+  }
+  if(localAi.loading) return localAi.status || 'Loading local model';
+  if(localAi.error) return localAi.error;
+  if(!('gpu' in navigator)) return 'WebGPU unavailable';
+  return 'Local model available';
+}
+
+function getRecentAnswers(){
+  return state.history.slice(-5).map(entry=>{
+    const q = QUESTIONS[entry.qid];
+    const opt = q?.opts?.[entry.optIdx];
+    if(!q || !opt) return '';
+    return `${q.text} ${opt.t}`;
+  }).filter(Boolean).join('\n');
+}
+
+function getQuestionOptionsForPrompt(q){
+  return q.opts.map((opt,idx)=>{
+    const sub = opt.sub ? ` (${opt.sub})` : '';
+    return `${idx}: ${opt.t}${sub}`;
+  }).join('\n');
+}
+
+function detectUrgentLanguage(text){
+  const normalized = text.toLowerCase();
+  const checks = [
+    {re:/\b(crushing|heavy|severe|intense)?\s*(chest pain|chest pressure|pressure in my chest)\b/,reason:'Chest pain or pressure can need urgent evaluation, especially if severe, new, or paired with breathing trouble.'},
+    {re:/\b(can'?t breathe|cannot breathe|struggling to breathe|severe shortness of breath|blue lips)\b/,reason:'Severe breathing trouble is an emergency warning sign.'},
+    {re:/\b(face droop|slurred speech|one-sided weakness|weakness on one side|stroke)\b/,reason:'Stroke-like symptoms need emergency care immediately.'},
+    {re:/\b(worst headache|thunderclap headache|sudden severe headache)\b/,reason:'A sudden or worst-ever headache can be an emergency warning sign.'},
+    {re:/\b(throat swelling|tongue swelling|anaphylaxis|can'?t swallow)\b/,reason:'Throat or tongue swelling can signal a life-threatening allergic reaction.'},
+    {re:/\b(vomiting blood|throwing up blood|black tarry stool|blood in stool)\b/,reason:'Vomiting blood or black stools can signal internal bleeding.'},
+    {re:/\b(suicidal|suicide|kill myself|harm myself|self-harm)\b/,reason:'If you might harm yourself, call or text 988 now. If there is immediate danger, call 911.'}
+  ];
+  return checks.find(item=>item.re.test(normalized)) || null;
+}
+
 function renderWelcome(){
+  const input = escapeHtml(localAi.lastInput);
   return `
-  <div class="card welcome">
-    <div class="w-icon">🩺</div>
-    <div class="w-title">Check Your Symptoms</div>
-    <p class="w-desc">Answer a series of questions about your symptoms and receive a list of possible conditions with detailed information about symptoms, causes, and treatment options.</p>
-    <div class="features">
-      <div class="feat"><div class="fi">📋</div><div class="fl">Multiple-choice questions</div></div>
-      <div class="feat"><div class="fi">🔍</div><div class="fl">40+ conditions covered</div></div>
-      <div class="feat"><div class="fi">💊</div><div class="fl">Treatment information</div></div>
-    </div>
-    <button class="btn-start" onclick="startQuiz()">Start Symptom Check →</button>
+  <div class="workspace">
+    <main class="console">
+      <div class="console-head">
+        <div>
+          <div class="kicker">Local intake engine</div>
+          <div class="console-title">Describe the issue. Qurest routes the next question.</div>
+          <p class="console-copy">The conversation is backed by a browser-local model when it is fast enough, with an instant question-tree router underneath so the flow never stalls.</p>
+        </div>
+        <div class="progress-chip">Private by design<div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div></div>
+      </div>
+      <div class="chat-stream">
+        <div class="message">
+          <div class="avatar">Q</div>
+          <div class="bubble">
+            <div class="bubble-title">What is going on today?</div>
+            <div class="bubble-sub">Use natural language. Short is fine. You can also skip straight to the answer chips.</div>
+          </div>
+        </div>
+      </div>
+      <div class="composer">
+        <textarea class="ai-input" id="ai-input" placeholder="Example: runny nose, cough, sore throat, and mild fever for two days" oninput="localAi.lastInput=this.value">${input}</textarea>
+        <div class="composer-actions">
+          <div class="action-left">
+            <button class="btn-primary" onclick="startIntake()">Begin Guided Intake</button>
+            <button class="btn-secondary" onclick="startQuiz(false)">Open Answer Chips</button>
+          </div>
+          <button class="btn-link" onclick="initLocalGuide()">Prepare Local Model</button>
+        </div>
+      </div>
+    </main>
+    ${renderSidePanel()}
   </div>`;
+}
+
+function renderSidePanel(){
+  const modelState = localAi.ready ? `${LOCAL_AI_MODEL_LABEL}${localAi.vendor ? ` on ${localAi.vendor}` : ''}` : getAiStatusLine();
+  const path = state.history.map((entry,idx)=>{
+    const q = QUESTIONS[entry.qid];
+    const opt = q?.opts?.[entry.optIdx];
+    return opt ? `<div class="path-item">${idx+1}. ${escapeHtml(opt.t)}</div>` : '';
+  }).join('');
+
+  return `
+  <aside class="side-panel">
+    <div class="side-label">System</div>
+    <div class="status-row"><span>Routing</span><strong>${escapeHtml(localAi.degraded?'Fast route':localAi.ready?'Model + tree':'Fast route')}</strong></div>
+    <div class="status-row"><span>Model</span><strong>${escapeHtml(modelState)}</strong></div>
+    <div class="status-row"><span>Fallback</span><strong>Always on</strong></div>
+    <div class="side-label" style="margin-top:1rem">Path</div>
+    <div class="path-list">${path || '<div class="path-item">No answers yet</div>'}</div>
+  </aside>`;
+}
+
+function renderRouteNote(qid,q){
+  const warning = localAi.warning || localAi.suggestion?.urgentWarning;
+  let html = warning ? `<div class="route-note danger-note"><strong>Urgent signal:</strong> ${escapeHtml(warning.reason || warning)}</div>` : '';
+  const suggestion = localAi.suggestion;
+  if(!suggestion || suggestion.qid !== qid) return html;
+
+  if(suggestion.action === 'select' && q.opts[suggestion.optionIndex]){
+    const opt = q.opts[suggestion.optionIndex];
+    html += `<div class="message">
+      <div class="avatar">Q</div>
+      <div class="bubble">
+        <div class="bubble-title">I would route this to ${escapeHtml(opt.t)}.</div>
+        <div class="bubble-sub">${escapeHtml(suggestion.rationale)} ${suggestion.source==='llm'?'Local model used.':'Fast router used.'}</div>
+      </div>
+    </div>`;
+  }else if(suggestion.action === 'clarify'){
+    html += `<div class="message">
+      <div class="avatar">Q</div>
+      <div class="bubble">
+        <div class="bubble-title">I need one more detail.</div>
+        <div class="bubble-sub">${escapeHtml(suggestion.clarifyingQuestion || 'What symptom is most prominent, and when did it start?')}</div>
+      </div>
+    </div>`;
+  }
+  return html;
 }
 
 function renderQuiz(){
@@ -585,32 +789,318 @@ function renderQuiz(){
   const stepNum = state.history.length+1;
   const totalQuestions = state.history.length + getRemainingQuestionCount(qid);
   const pct = Math.min(Math.round((state.history.length/totalQuestions)*100),95);
+  const input = escapeHtml(localAi.lastInput);
+  const routeDisabled = localAi.busy ? 'disabled' : '';
 
   return `
-  <div class="progress-wrap">
-    <div class="progress-meta"><span>Progress</span><span>Step ${stepNum} of ${totalQuestions}</span></div>
-    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
-  </div>
-  <div class="card">
-    <div class="q-label">Question ${stepNum}</div>
-    <div class="q-text">${q.text}${q.sub?`<div class="q-sub">${q.sub}</div>`:''}</div>
-    <div class="options" id="opts">
-      ${q.opts.map((o,i)=>`
-        <button class="opt${pendingOpt===i?' selected':''}" onclick="selectOpt(${i})" id="opt${i}">
-          <span class="opt-icon">${o.icon}</span>
-          <span class="opt-letter">${getOptionLabel(i)}</span>
-          <span><strong>${o.t}</strong>${o.sub?`<br><small style="color:var(--muted)">${o.sub}</small>`:''}</span>
-        </button>`).join('')}
-    </div>
-    <div class="nav">
-      <button class="btn-back" onclick="goBack()" ${state.history.length===0?'disabled':''}>← Back</button>
-      <button class="btn-next" id="btn-next" ${pendingOpt===null?'disabled':''} onclick="advance()">Continue →</button>
-    </div>
+  <div class="workspace">
+    <main class="console">
+      <div class="console-head">
+        <div>
+          <div class="kicker">Question ${stepNum}</div>
+          <div class="console-title">${escapeHtml(q.text)}</div>
+          ${q.sub?`<p class="console-copy">${escapeHtml(q.sub)}</p>`:''}
+        </div>
+        <div class="progress-chip">Step ${stepNum} of ${totalQuestions}<div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div></div>
+      </div>
+      <div class="chat-stream">
+        <div class="message">
+          <div class="avatar">Q</div>
+          <div class="bubble">
+            <div class="bubble-title">${escapeHtml(q.text)}</div>
+            <div class="bubble-sub">Pick a chip, or answer in your own words and I will route it.</div>
+          </div>
+        </div>
+        ${renderRouteNote(qid,q)}
+      </div>
+      <div class="choice-grid" id="opts">
+        ${q.opts.map((o,i)=>`
+          <button class="opt${pendingOpt===i?' selected':''}" onclick="selectOpt(${i})" id="opt${i}">
+            <span class="opt-letter">${getOptionLabel(i)}</span>
+            <span><strong>${escapeHtml(o.t)}</strong>${o.sub?`<small>${escapeHtml(o.sub)}</small>`:''}</span>
+          </button>`).join('')}
+      </div>
+      <div class="composer">
+        <textarea class="ai-input" id="ai-input" placeholder="Answer in your own words" oninput="localAi.lastInput=this.value">${input}</textarea>
+        ${localAi.busy?'<div class="route-note"><strong>Routing...</strong> I will fall back automatically if the local model is slow.</div>':''}
+        <div class="composer-actions nav">
+          <div class="action-left">
+            <button class="btn-secondary" onclick="goBack()" ${state.history.length===0?'disabled':''}>Back</button>
+            <button class="btn-secondary" onclick="clearAiGuide()" ${localAi.busy?'disabled':''}>Clear</button>
+          </div>
+          <div class="action-right">
+            <button class="btn-secondary" onclick="runAiGuide()" ${routeDisabled}>Route Text</button>
+            <button class="btn-next" id="btn-next" ${pendingOpt===null?'disabled':''} onclick="advance()">Continue</button>
+          </div>
+        </div>
+      </div>
+    </main>
+    ${renderSidePanel()}
   </div>`;
+}
+
+async function initLocalGuide(){
+  if(localAi.loading || localAi.ready) return;
+  localAi.error = '';
+  localAi.loading = true;
+  localAi.progress = 0;
+  localAi.status = 'Preparing WebLLM';
+  render();
+
+  if(!('gpu' in navigator)){
+    localAi.loading = false;
+    localAi.error = 'WebGPU is not available in this browser';
+    render();
+    return;
+  }
+
+  try{
+    const webllm = await import('https://esm.run/@mlc-ai/web-llm');
+    localAi.status = 'Downloading model files';
+    render();
+
+    localAi.engine = await webllm.CreateMLCEngine(LOCAL_AI_MODEL,{
+      initProgressCallback: progress=>{
+        localAi.progress = typeof progress.progress === 'number' ? progress.progress : localAi.progress;
+        localAi.status = progress.text || progress.message || 'Loading local model';
+        updateAiStatusDom();
+      }
+    });
+
+    try{
+      if(typeof localAi.engine.getGPUVendor === 'function'){
+        localAi.vendor = await localAi.engine.getGPUVendor();
+      }
+    }catch(_err){
+      localAi.vendor = '';
+    }
+
+    localAi.loading = false;
+    localAi.ready = true;
+    localAi.progress = 1;
+    localAi.status = 'Local guide ready';
+  }catch(err){
+    localAi.loading = false;
+    localAi.ready = false;
+    localAi.degraded = true;
+    localAi.engine = null;
+    localAi.error = err?.message ? `Model startup failed: ${err.message}` : 'Model startup failed';
+  }
+
+  render();
+}
+
+function updateAiStatusDom(){
+  updateSystemStatus();
+}
+
+function updateSystemStatus(){
+  const status = document.getElementById('system-status');
+  if(!status) return;
+  status.innerHTML = `<span class="dot ${getAiDotClass()}"></span><span>${escapeHtml(getAiStatusLine())}</span>`;
+}
+
+async function runAiGuide(){
+  if(localAi.busy) return;
+  const inputEl = document.getElementById('ai-input');
+  const userText = (inputEl?.value || localAi.lastInput || '').trim();
+  if(!userText) return;
+
+  const qid = getCurrentQuestionId();
+  const q = QUESTIONS[qid];
+  localAi.lastInput = userText;
+  localAi.warning = detectUrgentLanguage(userText);
+  localAi.suggestion = null;
+  const fallback = markSuggestionSource(getKeywordSuggestion(qid,q,userText),'fast');
+
+  if(!localAi.ready || localAi.degraded){
+    localAi.suggestion = fallback;
+    applySuggestion(fallback);
+    render();
+    if(!localAi.ready && !localAi.loading && !localAi.error && 'gpu' in navigator){
+      initLocalGuide();
+    }
+    return;
+  }
+
+  localAi.busy = true;
+  render();
+
+  try{
+    const suggestion = await withTimeout(askLocalModel(qid,q,userText),6500);
+    localAi.suggestion = markSuggestionSource(suggestion || fallback,suggestion ? 'llm' : 'fast');
+  }catch(err){
+    localAi.degraded = true;
+    localAi.status = 'Local model was slow; fast router active';
+    localAi.suggestion = fallback;
+    try{
+      if(localAi.engine && typeof localAi.engine.resetChat === 'function'){
+        await localAi.engine.resetChat(true);
+      }
+    }catch(_resetErr){}
+  }
+
+  localAi.busy = false;
+  applySuggestion(localAi.suggestion);
+  render();
+}
+
+function withTimeout(promise,ms){
+  return Promise.race([
+    promise,
+    new Promise((_,reject)=>setTimeout(()=>reject(new Error('Local guide timed out')),ms))
+  ]);
+}
+
+async function askLocalModel(qid,q,userText){
+  if(localAi.engine && typeof localAi.engine.resetChat === 'function'){
+    await localAi.engine.resetChat(true);
+  }
+  const reply = await localAi.engine.chat.completions.create({
+    messages: buildGuideMessages(qid,q,userText),
+    temperature: 0,
+    top_p: 1,
+    max_tokens: 72,
+    stream: false
+  });
+  const content = reply?.choices?.[0]?.message?.content || '';
+  const parsed = parseJsonObject(content);
+  return normalizeGuideSuggestion(parsed,qid,q,userText);
+}
+
+function markSuggestionSource(suggestion,source){
+  if(!suggestion) return suggestion;
+  return {...suggestion,source};
+}
+
+function applySuggestion(suggestion){
+  if(suggestion?.action === 'select' && Number.isInteger(suggestion.optionIndex)){
+    pendingOpt = suggestion.optionIndex;
+  }
+}
+
+function buildGuideMessages(qid,q,userText){
+  return [
+    {
+      role:'system',
+      content:[
+        'Route symptom text to one option. Do not diagnose or give treatment.',
+        'Return compact JSON only.',
+        'Schema: {"action":"select","optionIndex":0,"confidence":"high|medium|low","rationale":"short reason","urgent":false,"urgentReason":""}.',
+        'Use {"action":"clarify","clarifyingQuestion":"short question","urgent":false,"urgentReason":""} only if no option fits.',
+        'Set urgent true for chest pain, severe breathing trouble, stroke signs, anaphylaxis, suicidal intent, worst-ever sudden headache, major trauma, or uncontrolled bleeding.'
+      ].join(' ')
+    },
+    {
+      role:'user',
+      content:[
+        `Current question id: ${qid}`,
+        `Current question: ${q.text}`,
+        q.sub ? `Question helper text: ${q.sub}` : '',
+        'Options:',
+        getQuestionOptionsForPrompt(q),
+        getRecentAnswers() ? `Recent selected answers:\n${getRecentAnswers()}` : '',
+        `User text: ${userText}`
+      ].filter(Boolean).join('\n')
+    }
+  ];
+}
+
+function parseJsonObject(raw){
+  try{return JSON.parse(raw);}
+  catch(_err){
+    const match = String(raw).match(/\{[\s\S]*\}/);
+    if(match){
+      try{return JSON.parse(match[0]);}
+      catch(_nestedErr){}
+    }
+  }
+  return null;
+}
+
+function normalizeGuideSuggestion(parsed,qid,q,userText){
+  const fallback = getKeywordSuggestion(qid,q,userText);
+  if(!parsed || typeof parsed !== 'object') return fallback;
+
+  const urgentWarning = parsed.urgent ? {
+    reason: parsed.urgentReason || 'Your description may include emergency warning signs. If symptoms are severe or worsening, seek urgent care or call 911.'
+  } : null;
+
+  if(parsed.action === 'select'){
+    const optionIndex = Number(parsed.optionIndex);
+    if(Number.isInteger(optionIndex) && optionIndex >= 0 && optionIndex < q.opts.length){
+      return {
+        qid,
+        action:'select',
+        optionIndex,
+        confidence: String(parsed.confidence || 'medium').toLowerCase(),
+        rationale: parsed.rationale || 'This choice best matches the details you described.',
+        urgentWarning
+      };
+    }
+  }
+
+  if(parsed.action === 'clarify'){
+    return {
+      qid,
+      action:'clarify',
+      clarifyingQuestion: parsed.clarifyingQuestion || 'Could you add one detail about timing, severity, or what symptom is most prominent?',
+      urgentWarning
+    };
+  }
+
+  if(urgentWarning && fallback){
+    fallback.urgentWarning = urgentWarning;
+  }
+  return fallback;
+}
+
+function getKeywordSuggestion(qid,q,userText){
+  const stop = new Set(['with','that','this','from','have','been','very','about','your','what','when','where','over','under','also','and','the','for','not','but','are']);
+  const terms = userText.toLowerCase().match(/[a-z0-9]+/g)?.filter(t=>t.length>2 && !stop.has(t)) || [];
+  let best = {idx:-1,score:0};
+
+  q.opts.forEach((opt,idx)=>{
+    const haystack = `${opt.t} ${opt.sub || ''}`.toLowerCase();
+    const score = terms.reduce((sum,term)=>sum + (haystack.includes(term) ? 1 : 0),0);
+    if(score > best.score) best = {idx,score};
+  });
+
+  if(best.idx >= 0 && best.score > 0){
+    return {
+      qid,
+      action:'select',
+      optionIndex:best.idx,
+      confidence:best.score > 2 ? 'medium' : 'low',
+      rationale:'This is the closest match I could find in the current choices.'
+    };
+  }
+
+  return {
+    qid,
+    action:'clarify',
+    clarifyingQuestion:'Could you describe the main symptom, when it started, and how severe it feels?'
+  };
+}
+
+function clearAiGuide(){
+  localAi.lastInput = '';
+  localAi.suggestion = null;
+  localAi.warning = null;
+  pendingOpt = null;
+  render();
+}
+
+function acceptAiSuggestion(i){
+  selectOpt(i);
+  advance();
 }
 
 function selectOpt(i){
   pendingOpt = i;
+  if(!localAi.suggestion || localAi.suggestion.optionIndex !== i){
+    localAi.suggestion = null;
+  }
   document.querySelectorAll('.opt').forEach((el,idx)=>{
     el.classList.toggle('selected',idx===i);
   });
@@ -627,6 +1117,9 @@ function advance(){
   addScores(opt.s);
   state.history.push({qid, optIdx:pendingOpt, next:opt.next, scores:opt.s});
   pendingOpt = null;
+  localAi.suggestion = null;
+  localAi.warning = null;
+  localAi.lastInput = '';
   if(opt.next==='RESULTS'){
     state.screen='results';
   }
@@ -639,13 +1132,31 @@ function goBack(){
   removeScores(last.scores);
   pendingOpt = last.optIdx;
   state.screen='quiz';
+  localAi.suggestion = null;
+  localAi.warning = null;
+  localAi.lastInput = '';
   render();
 }
 
-function startQuiz(){
+function startIntake(){
+  const inputEl = document.getElementById('ai-input');
+  localAi.lastInput = (inputEl?.value || localAi.lastInput || '').trim();
   state.screen='quiz';
   pendingOpt = null;
   render();
+  if(!localAi.ready && !localAi.loading && !localAi.error && 'gpu' in navigator){
+    initLocalGuide();
+  }
+  if(localAi.lastInput){
+    runAiGuide();
+  }
+}
+
+function startQuiz(enableAi=false){
+  state.screen='quiz';
+  pendingOpt = null;
+  render();
+  if(enableAi) initLocalGuide();
 }
 
 // ═══════════════════════════════════════════════════
@@ -658,11 +1169,10 @@ function renderResults(){
     .slice(0,3);
 
   if(ranked.length===0){
-    return `<div class="card" style="text-align:center;padding:2.5rem">
-      <div style="font-size:2rem;margin-bottom:1rem">🤔</div>
+    return `<div class="results-wrap"><div class="card" style="text-align:center;padding:2.5rem;border-radius:14px">
       <h2>No Clear Match</h2>
       <p style="color:var(--muted);margin-top:.75rem">Based on your answers, we couldn't identify a likely condition. Please consult a healthcare provider for proper evaluation.</p>
-      <button class="btn-restart" onclick="restart()">Start Over</button></div>`;
+      <button class="btn-restart" onclick="restart()">Start Over</button></div></div>`;
   }
 
   const maxScore = ranked[0][1];
@@ -671,15 +1181,14 @@ function renderResults(){
   const ranks = ['Most Likely','Also Possible','Also Consider'];
   const rankClasses = ['r1','r2','r3'];
 
-  let html = `
+  let html = `<div class="results-wrap">
   <div class="res-header">
-    <div class="res-icon">📋</div>
     <div class="res-title">Your Results</div>
     <p class="res-sub">Based on your symptoms, here are the most likely conditions. These results are for educational purposes only and are not a diagnosis.</p>
   </div>`;
 
   if(hasEmergency){
-    html += `<div class="emergency-banner">🚨 One or more possible conditions below may require emergency medical attention. Please seek care immediately if symptoms are severe.</div>`;
+    html += `<div class="emergency-banner">One or more possible conditions below may require emergency medical attention. Please seek care immediately if symptoms are severe.</div>`;
   }
 
   ranked.forEach(([cid, score], idx)=>{
@@ -688,7 +1197,7 @@ function renderResults(){
     const pct = Math.round((score/maxScore)*100);
     const barClass = pct>=70?'mhigh':pct>=40?'mmed':'mlow';
     const urgClass = c.urgency==='high'?'u-high':c.urgency==='mod'?'u-mod':'u-low';
-    const urgLabel = c.urgency==='high'?'⚠️ Seek Medical Care Soon':c.urgency==='mod'?'🩺 See a Doctor':'ℹ️ Generally Not Urgent';
+    const urgLabel = c.urgency==='high'?'Seek Medical Care Soon':c.urgency==='mod'?'See a Doctor':'Generally Not Urgent';
 
     html += `
     <div class="res-card ${idx===0?'top':''}">
@@ -715,7 +1224,7 @@ function renderResults(){
 
       <div class="sec-label" onclick="toggleSection('trt${idx}')" id="lbl-trt${idx}">
         <svg width="8" height="12" viewBox="0 0 8 12"><path d="M1 1l6 5-6 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
-        Treatment Options
+        Care Options
       </div>
       <div class="list-panel" id="trt${idx}">
         <div class="list">${c.treatments.map(t=>`<div class="list-item trt">${t}</div>`).join('')}</div>
@@ -733,7 +1242,7 @@ function renderResults(){
   <div class="res-disclaimer">
     <strong>Disclaimer:</strong> This symptom checker is for general educational information only. It is <strong>not a substitute for professional medical advice, diagnosis, or treatment</strong>. The results are based on limited information and may not accurately reflect your condition. Always consult a qualified healthcare professional for any health concerns. If you believe you are experiencing a medical emergency, <strong>call 911 immediately</strong>.
   </div>
-  <button class="btn-restart" onclick="restart()">← Check Different Symptoms</button>`;
+  <button class="btn-restart" onclick="restart()">Check Different Symptoms</button></div>`;
 
   return html;
 }
@@ -753,6 +1262,7 @@ function restart(){
 
 function render(){
   const app = document.getElementById('app');
+  updateSystemStatus();
   if(state.screen==='welcome') app.innerHTML = renderWelcome();
   else if(state.screen==='quiz') app.innerHTML = renderQuiz();
   else {
