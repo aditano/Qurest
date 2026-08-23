@@ -23,8 +23,10 @@ Qurest is a browser-based symptom checker prototype with a dark, chip-driven int
 The current prototype includes:
 
 - 44 condition profiles
-- 34 question nodes in the decision tree
+- 35 question nodes in the decision tree (including emergency red-flag screening)
 - Multi-select first step with deterministic chip navigation
+- Interactive body-region map that highlights affected areas during intake
+- Live match preview with relative likelihood scoring
 - Results cards with common symptoms, care options, and urgency messaging
 - Educational-only medical disclaimers throughout the experience
 
