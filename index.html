@@ -3,24 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Qurest</title>
+  <title>Qurest — Symptom Analyzer</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563eb'/%3E%3Cpath d='M32 12v40M18 28h28' stroke='white' stroke-width='7' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     :root{
-      --bg:#06070b;--ink:#f7fbff;--muted:#96a2b8;--soft:#c9d5e5;
-      --panel:rgba(9,12,19,.78);--panel-2:rgba(16,20,31,.72);--panel-3:rgba(255,255,255,.045);
-      --line:rgba(255,255,255,.12);--line-strong:rgba(255,255,255,.22);
-      --accent:#36e2df;--accent-2:#8b5cf6;--mint:#8ff0bd;--warning:#f5c451;
-      --danger:#fb7185;--success:#4ade80;--shadow:0 28px 90px rgba(0,0,0,.5);
+      --bg:#05060c;--ink:#f4f8ff;--muted:#8b9ab5;--soft:#c4d0e4;
+      --panel:rgba(10,13,22,.82);--panel-2:rgba(16,21,34,.76);--panel-3:rgba(255,255,255,.05);
+      --line:rgba(255,255,255,.11);--line-strong:rgba(255,255,255,.24);
+      --accent:#3ee8d6;--accent-2:#a78bfa;--accent-3:#ff7eb3;--mint:#7ef0c4;--warning:#fbbf24;
+      --danger:#ff6b8a;--success:#4ade80;--shadow:0 28px 90px rgba(0,0,0,.55);
+      --glow:0 0 40px rgba(62,232,214,.18);
     }
     body{
       min-height:100vh;color:var(--ink);
       font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
       background:
-        linear-gradient(140deg,rgba(54,226,223,.14),transparent 31%),
-        linear-gradient(215deg,rgba(139,92,246,.2),transparent 36%),
-        linear-gradient(180deg,#080912 0%,#05060b 56%,#030407 100%);
+        radial-gradient(ellipse 80% 50% at 15% 10%,rgba(62,232,214,.12),transparent 55%),
+        radial-gradient(ellipse 60% 45% at 85% 20%,rgba(167,139,250,.16),transparent 50%),
+        radial-gradient(ellipse 50% 40% at 50% 90%,rgba(255,126,179,.08),transparent 55%),
+        linear-gradient(180deg,#080a12 0%,#05060c 55%,#030408 100%);
       letter-spacing:0;overflow-x:hidden;
     }
     body::before{
@@ -55,7 +60,7 @@
       background:linear-gradient(145deg,rgba(54,226,223,.24),rgba(139,92,246,.18) 58%,rgba(255,255,255,.08));
       font-weight:900;box-shadow:0 0 34px rgba(54,226,223,.22);flex-shrink:0;
     }
-    .header-text{min-width:0}.header-text h1{font-size:1.08rem;font-weight:850}.header-text p{font-size:.75rem;color:var(--muted)}
+    .header-text{min-width:0}.header-text h1{font-family:Outfit,Inter,sans-serif;font-size:1.15rem;font-weight:800;letter-spacing:-.02em}.header-text p{font-size:.75rem;color:var(--muted)}
     .system-pill{
       display:inline-flex;align-items:center;gap:.45rem;border:1px solid rgba(255,255,255,.14);
       border-radius:999px;padding:.45rem .72rem;color:var(--soft);font-size:.78rem;background:rgba(255,255,255,.055);
@@ -81,7 +86,7 @@
     .console{border-radius:8px;overflow:hidden;min-height:620px;display:flex;flex-direction:column}
     .console-head{padding:1rem 1.05rem;border-bottom:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;gap:1rem;align-items:flex-start;background:linear-gradient(90deg,rgba(54,226,223,.08),rgba(139,92,246,.08))}
     .kicker{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:850;margin-bottom:.42rem}
-    .console-title{font-size:1.42rem;line-height:1.12;font-weight:850;max-width:690px}
+    .console-title{font-family:Outfit,Inter,sans-serif;font-size:1.48rem;line-height:1.12;font-weight:800;max-width:690px;letter-spacing:-.02em}
     .console-copy{color:var(--muted);font-size:.88rem;line-height:1.52;margin-top:.55rem;max-width:660px}
     .progress-chip{min-width:118px;text-align:right;color:var(--soft);font-size:.78rem;font-weight:800}
     .progress-bar{height:5px;background:rgba(255,255,255,.09);border-radius:999px;overflow:hidden;margin-top:.55rem}
@@ -96,11 +101,17 @@
     .choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;padding:0 1.05rem 1.05rem}
     .opt{
       min-height:78px;display:flex;align-items:flex-start;gap:.72rem;padding:.82rem .86rem;border:1px solid rgba(255,255,255,.12);
-      border-radius:8px;cursor:pointer;text-align:left;width:100%;background:rgba(255,255,255,.04);
-      color:var(--ink);font-size:.88rem;line-height:1.34;transition:border-color .16s,background .16s,transform .16s,box-shadow .16s;
+      border-radius:12px;cursor:pointer;text-align:left;width:100%;background:rgba(255,255,255,.04);
+      color:var(--ink);font-size:.88rem;line-height:1.34;transition:border-color .18s,background .18s,transform .18s,box-shadow .18s;
     }
-    .opt:hover{border-color:rgba(54,226,223,.58);background:rgba(54,226,223,.075);transform:translateY(-1px)}
-    .opt.selected{border-color:rgba(54,226,223,.78);background:rgba(54,226,223,.13);box-shadow:0 0 0 1px rgba(54,226,223,.16) inset,0 0 26px rgba(54,226,223,.12)}
+    .opt:hover{border-color:rgba(62,232,214,.55);background:rgba(62,232,214,.08);transform:translateY(-2px);box-shadow:var(--glow)}
+    .opt.selected{border-color:rgba(62,232,214,.75);background:rgba(62,232,214,.14);box-shadow:0 0 0 1px rgba(62,232,214,.18) inset,0 0 30px rgba(62,232,214,.14)}
+    .opt-icon{
+      display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:10px;
+      background:linear-gradient(145deg,rgba(62,232,214,.15),rgba(167,139,250,.12));border:1px solid rgba(255,255,255,.1);
+      font-size:1.1rem;flex-shrink:0;
+    }
+    .opt.selected .opt-icon{background:linear-gradient(145deg,rgba(62,232,214,.35),rgba(167,139,250,.25));border-color:rgba(62,232,214,.4)}
     .opt-letter{display:flex;align-items:center;justify-content:center;width:26px;height:26px;background:rgba(255,255,255,.08);border-radius:7px;font-size:.72rem;font-weight:900;flex-shrink:0;color:var(--soft)}
     .opt.selected .opt-letter,.opt:hover .opt-letter{background:var(--accent);color:#041013}
     .opt small{display:block;color:var(--muted);font-size:.76rem;margin-top:.23rem;line-height:1.34}
@@ -131,11 +142,19 @@
     .symptom-chip{border:1px solid rgba(255,255,255,.12);border-radius:999px;background:rgba(255,255,255,.06);padding:.36rem .58rem;color:var(--soft);font-size:.74rem;font-weight:750;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     .symptom-chip:nth-child(2n){border-color:rgba(54,226,223,.32);background:rgba(54,226,223,.09)}
     .symptom-chip:nth-child(3n){border-color:rgba(139,92,246,.34);background:rgba(139,92,246,.1)}
-    .body-scan{height:225px;position:relative;margin-top:auto;border-top:1px solid rgba(255,255,255,.08)}
-    .body-scan::before{content:"";position:absolute;left:50%;top:32px;width:62px;height:62px;border-radius:50%;transform:translateX(-50%);border:1px solid rgba(54,226,223,.55);background:radial-gradient(circle,rgba(54,226,223,.26) 0 2px,transparent 3px),rgba(54,226,223,.06);background-size:13px 13px;box-shadow:0 0 34px rgba(54,226,223,.24)}
-    .body-scan::after{content:"";position:absolute;left:50%;bottom:-26px;width:132px;height:156px;transform:translateX(-50%);border-radius:60px 60px 22px 22px;border:1px solid rgba(139,92,246,.5);background:linear-gradient(180deg,rgba(54,226,223,.18),rgba(139,92,246,.22) 62%,rgba(255,255,255,.03));clip-path:polygon(26% 0,74% 0,92% 100%,8% 100%);box-shadow:0 0 42px rgba(139,92,246,.18)}
-    .body-line{position:absolute;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(54,226,223,.38),transparent)}
-    .body-line:nth-child(1){top:58px}.body-line:nth-child(2){top:112px}.body-line:nth-child(3){top:166px}
+    .body-scan{height:240px;position:relative;margin-top:auto;border-top:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;padding:.5rem 0}
+    .body-map{position:relative;width:110px;height:200px}
+    .body-region{position:absolute;border-radius:50%;border:1.5px solid transparent;transition:all .35s ease;opacity:.25}
+    .body-region.active{opacity:1;border-color:rgba(62,232,214,.7);background:rgba(62,232,214,.18);box-shadow:0 0 20px rgba(62,232,214,.3)}
+    .body-region.head{top:0;left:50%;transform:translateX(-50%);width:44px;height:44px}
+    .body-region.chest{top:48px;left:50%;transform:translateX(-50%);width:52px;height:36px;border-radius:8px}
+    .body-region.abdomen{top:88px;left:50%;transform:translateX(-50%);width:48px;height:32px;border-radius:8px}
+    .body-region.pelvis{top:124px;left:50%;transform:translateX(-50%);width:40px;height:24px;border-radius:6px}
+    .body-region.limb-l{top:72px;left:4px;width:22px;height:70px;border-radius:10px}
+    .body-region.limb-r{top:72px;right:4px;width:22px;height:70px;border-radius:10px}
+    .body-region.skin{inset:8px;border-radius:16px;border-style:dashed}
+    .body-silhouette{position:absolute;inset:0;border:1px solid rgba(167,139,250,.35);border-radius:50px 50px 18px 18px;background:linear-gradient(180deg,rgba(62,232,214,.08),rgba(167,139,250,.1) 60%,rgba(255,255,255,.02));clip-path:polygon(24% 0,76% 0,94% 100%,6% 100%)}
+    .body-scan-label{position:absolute;bottom:4px;left:0;right:0;text-align:center;font-size:.65rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;font-weight:700}
     .status-row{display:flex;justify-content:space-between;gap:1rem;border-bottom:1px solid rgba(255,255,255,.08);padding:.62rem 0;color:var(--muted);font-size:.8rem}
     .status-row strong{color:var(--soft);font-weight:850;text-align:right}
     .path-list{display:flex;flex-direction:column;gap:.45rem;margin-top:.75rem}
@@ -152,8 +171,24 @@
     .match-empty{border:1px dashed rgba(255,255,255,.14);border-radius:8px;padding:.9rem;color:var(--muted);font-size:.82rem;line-height:1.45;background:rgba(255,255,255,.03)}
     .power-line{margin-top:auto;padding-top:.85rem;border-top:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;gap:1rem;color:var(--muted);font-size:.78rem}
     .power-line strong{color:var(--soft);text-align:right}
-    .fade-in{animation:fi .25s ease}
-    @keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .fade-in{animation:fi .3s ease}
+    @keyframes fi{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes pulse-ring{0%,100%{box-shadow:0 0 44px rgba(62,232,214,.18)}50%{box-shadow:0 0 56px rgba(62,232,214,.32)}}
+    .progress-ring{animation:pulse-ring 3s ease-in-out infinite}
+    .results-workspace .console{min-height:auto}
+    .results-main{padding:1.05rem;flex:1;overflow-y:auto;max-height:calc(100vh - 220px)}
+    .analysis-summary{border:1px solid rgba(62,232,214,.25);border-radius:12px;padding:.9rem 1rem;margin-bottom:1rem;background:linear-gradient(135deg,rgba(62,232,214,.08),rgba(167,139,250,.06))}
+    .analysis-summary h3{font-family:Outfit,Inter,sans-serif;font-size:1rem;font-weight:800;margin-bottom:.4rem}
+    .analysis-tags{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.5rem}
+    .analysis-tag{font-size:.72rem;padding:.28rem .55rem;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:var(--soft);font-weight:700}
+    .emergency-screen{text-align:center;padding:2rem 1.5rem}
+    .emergency-screen .emergency-icon{font-size:3rem;margin-bottom:1rem}
+    .emergency-screen h2{font-family:Outfit,Inter,sans-serif;font-size:1.6rem;font-weight:800;margin-bottom:.75rem;color:#fecdd3}
+    .emergency-screen p{color:var(--soft);line-height:1.6;margin-bottom:1.25rem;max-width:480px;margin-left:auto;margin-right:auto}
+    .emergency-actions{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap}
+    .match-confidence{font-size:.7rem;color:var(--muted);margin-top:.15rem}
+    .opt:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+    .sec-label:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
     .results-wrap{max-width:940px;margin:0 auto}
     .res-header{text-align:left;margin-bottom:1rem}
     .res-title{font-size:1.65rem;font-weight:850;margin-bottom:.4rem}
@@ -196,10 +231,10 @@
     <div class="logo">Q</div>
     <div class="header-text">
       <h1>Qurest</h1>
-      <p>Local symptom navigation</p>
+      <p>In-depth symptom analyzer</p>
     </div>
   </div>
-  <div class="system-pill"><span class="dot ready"></span><span>Guided chips ready</span></div>
+  <div class="system-pill"><span class="dot ready"></span><span class="status-text">Guided chips ready</span></div>
 </header>
 
 <div class="container">
@@ -265,6 +300,16 @@ const CONDITIONS = {
 // QUESTIONS
 // ═══════════════════════════════════════════════════
 const QUESTIONS = {
+  redflag:{
+    text:"Before we begin — do any of these emergency warning signs apply right now?",
+    sub:"If any apply, seek emergency care immediately. This tool is not a substitute for professional medical help.",
+    opts:[
+      {t:"Chest pain with shortness of breath or sweating",icon:"🚨",next:"EMERGENCY",s:{}},
+      {t:"Sudden weakness, numbness, slurred speech, or facial drooping",icon:"🚨",next:"EMERGENCY",s:{}},
+      {t:"Severe difficulty breathing, choking, or bluish lips/fingernails",icon:"🚨",next:"EMERGENCY",s:{}},
+      {t:"None of these — I can continue with the symptom check",icon:"✅",next:"start",s:{}}
+    ]
+  },
   start:{
     text:"What is your primary concern today?",
     sub:"Select every area that applies. Mixed symptoms will be checked together.",
@@ -349,10 +394,10 @@ const QUESTIONS = {
   resp4:{
     text:"What best describes your chest or upper-airway symptoms?",
     opts:[
-      {t:"Deep cough, chest pain with breathing, or shortness of breath at rest",icon:"🫁",next:"dur",s:{pneumonia:10,covid19:4,bronchitis:3}},
-      {t:"Facial pressure, thick nasal mucus, or bad breath after a cold",icon:"🤧",next:"dur",s:{sinusitis:10,common_cold:2}},
-      {t:"Mostly wheezing or chest tightness from exercise, cold air, or allergens",icon:"🏃",next:"dur",s:{asthma:8}},
-      {t:"Mostly congestion, sneezing, or scratchy throat",icon:"🌬️",next:"dur",s:{common_cold:4,allergic_rhinitis:4}}
+      {t:"Deep cough, chest pain with breathing, or shortness of breath at rest",icon:"🫁",next:"fever",s:{pneumonia:10,covid19:4,bronchitis:3}},
+      {t:"Facial pressure, thick nasal mucus, or bad breath after a cold",icon:"🤧",next:"fever",s:{sinusitis:10,common_cold:2}},
+      {t:"Mostly wheezing or chest tightness from exercise, cold air, or allergens",icon:"🏃",next:"fever",s:{asthma:8}},
+      {t:"Mostly congestion, sneezing, or scratchy throat",icon:"🌬️",next:"fever",s:{common_cold:4,allergic_rhinitis:4}}
     ]
   },
   // DIGESTIVE
@@ -457,10 +502,10 @@ const QUESTIONS = {
   skin4:{
     text:"Which appearance best matches the skin change?",
     opts:[
-      {t:"Ring-shaped, circular, or peeling rash with a clearer center",icon:"⭕",next:"dur",s:{fungal_infection:16}},
-      {t:"Flaky inflamed patches that wax and wane",icon:"🧴",next:"dur",s:{eczema:6,psoriasis:4}},
-      {t:"Raised welts that move around or fade within hours",icon:"🌊",next:"dur",s:{hives:8}},
-      {t:"Exact outline where skin touched a product, plant, or metal",icon:"✋",next:"dur",s:{contact_dermatitis:8}}
+      {t:"Ring-shaped, circular, or peeling rash with a clearer center",icon:"⭕",next:"fever",s:{fungal_infection:16}},
+      {t:"Flaky inflamed patches that wax and wane",icon:"🧴",next:"fever",s:{eczema:6,psoriasis:4}},
+      {t:"Raised welts that move around or fade within hours",icon:"🌊",next:"fever",s:{hives:8}},
+      {t:"Exact outline where skin touched a product, plant, or metal",icon:"✋",next:"fever",s:{contact_dermatitis:8}}
     ]
   },
   // MUSCULOSKELETAL
@@ -533,10 +578,10 @@ const QUESTIONS = {
   mh4:{
     text:"Which extra detail fits best?",
     opts:[
-      {t:"Loud snoring, waking up gasping, or someone notices pauses in breathing",icon:"😮‍💨",next:"dur",s:{sleep_apnea:8,insomnia:2}},
-      {t:"Symptoms clearly followed a major stressor or life change",icon:"🌧️",next:"dur",s:{anxiety:4,depression:4}},
-      {t:"Fear surges in waves and then settles back down",icon:"🌊",next:"dur",s:{panic_disorder:7}},
-      {t:"My mind stays busy at night, but breathing or snoring is not the issue",icon:"🧠",next:"dur",s:{insomnia:8,anxiety:4}}
+      {t:"Loud snoring, waking up gasping, or someone notices pauses in breathing",icon:"😮‍💨",next:"fever",s:{sleep_apnea:8,insomnia:2}},
+      {t:"Symptoms clearly followed a major stressor or life change",icon:"🌧️",next:"fever",s:{anxiety:4,depression:4}},
+      {t:"Fear surges in waves and then settles back down",icon:"🌊",next:"fever",s:{panic_disorder:7}},
+      {t:"My mind stays busy at night, but breathing or snoring is not the issue",icon:"🧠",next:"fever",s:{insomnia:8,anxiety:4}}
     ]
   },
   // GENERAL
@@ -639,11 +684,70 @@ function removeScores(s){
 // ═══════════════════════════════════════════════════
 function getCurrentQuestionId(){
   const entry = state.history[state.history.length-1];
-  return entry ? entry.next : 'start';
+  return entry ? entry.next : 'redflag';
+}
+
+function getBodyRegions(){
+  const regions = new Set();
+  const areaMap = {
+    'head or neurological':'head','neurological':'head','headache':'head','dizz':'head',
+    'respiratory':'chest','cough':'chest','breath':'chest','chest':'chest','throat':'chest',
+    'digestive':'abdomen','stomach':'abdomen','abdominal':'abdomen','nausea':'abdomen','vomit':'abdomen',
+    'urinary':'pelvis','urination':'pelvis',
+    'skin':'skin','rash':'skin','itch':'skin',
+    'muscle or joint':'limb-l','joint':'limb-l','muscle':'limb-l',
+    'mental health':'head','anxiety':'head','sleep':'head',
+    'general or systemic':'skin','fever':'skin','fatigue':'skin'
+  };
+  state.history.forEach(entry=>{
+    getHistoryOptionTexts(entry).forEach(text=>{
+      const lower = text.toLowerCase();
+      for(const [needle,region] of Object.entries(areaMap)){
+        if(lower.includes(needle)){
+          if(region==='limb-l'){regions.add('limb-l');regions.add('limb-r');}
+          else regions.add(region);
+        }
+      }
+    });
+  });
+  return regions;
+}
+
+function renderBodyMap(){
+  const active = getBodyRegions();
+  const regions = ['head','chest','abdomen','pelvis','limb-l','limb-r','skin'];
+  const regionHtml = regions.map(r=>`<div class="body-region ${r}${active.has(r)?' active':''}"></div>`).join('');
+  return `<div class="body-scan" aria-label="Body region map">
+    <div class="body-map">
+      <div class="body-silhouette"></div>
+      ${regionHtml}
+    </div>
+    <div class="body-scan-label">${active.size ? active.size+' region'+(active.size>1?'s':'')+' active' : 'Select symptoms'}</div>
+  </div>`;
+}
+
+function updateStatusPill(){
+  const pill = document.querySelector('.system-pill');
+  if(!pill) return;
+  const dot = pill.querySelector('.dot');
+  const label = pill.querySelector('.status-text');
+  if(!dot || !label) return;
+  if(state.screen==='emergency'){
+    dot.className='dot error';
+    label.textContent='Emergency — seek care now';
+  }else if(state.screen==='results'){
+    dot.className='dot ready';
+    label.textContent='Analysis complete';
+  }else{
+    const qid = getCurrentQuestionId();
+    const step = state.history.length+1;
+    dot.className='dot loading';
+    label.textContent=`Analyzing · step ${step}`;
+  }
 }
 
 function getRemainingQuestionCount(qid, seen=new Set()){
-  if(qid==='RESULTS') return 0;
+  if(qid==='RESULTS' || qid==='EMERGENCY') return 0;
   if(!QUESTIONS[qid] || seen.has(qid)) return 0;
 
   const nextSeen = new Set(seen);
@@ -764,11 +868,7 @@ function renderAssessmentPanel(pct,caption){
     </div>
     <div class="progress-caption">${escapeHtml(caption)}</div>
     <div class="symptom-cloud">${tags}</div>
-    <div class="body-scan" aria-hidden="true">
-      <span class="body-line"></span>
-      <span class="body-line"></span>
-      <span class="body-line"></span>
-    </div>
+    ${renderBodyMap()}
   </aside>`;
 }
 
@@ -792,6 +892,7 @@ function renderSidePanel(){
       <div class="match-head">
         <div class="match-name">${escapeHtml(c.name)}</div>
         <div class="match-value">${pct}%</div>
+        <div class="match-confidence">relative</div>
       </div>
       <div class="match-bars">${renderSignalBars(pct)}</div>
       <div class="match-track"><div class="match-fill" style="width:${pct}%"></div></div>
@@ -843,8 +944,8 @@ function renderQuiz(){
       ${q.opts.map((o,i)=>{
         const selected = multi ? pendingOpts.includes(i) : pendingOpt===i;
         return `
-        <button class="opt${selected?' selected':''}" aria-pressed="${selected?'true':'false'}" onclick="selectOpt(${i})" id="opt${i}">
-          <span class="opt-letter">${selected && multi ? '✓' : getOptionLabel(i)}</span>
+        <button class="opt${selected?' selected':''}" aria-pressed="${selected?'true':'false'}" onclick="selectOpt(${i})" id="opt${i}" data-idx="${i}">
+          ${o.icon?`<span class="opt-icon" aria-hidden="true">${selected && multi ? '✓' : o.icon}</span>`:`<span class="opt-letter">${selected && multi ? '✓' : getOptionLabel(i)}</span>`}
           <span><strong>${escapeHtml(o.t)}</strong>${o.sub?`<small>${escapeHtml(o.sub)}</small>`:''}</span>
         </button>`;
       }).join('')}
@@ -877,7 +978,9 @@ function selectOpt(i){
     el.classList.toggle('selected',selected);
     el.setAttribute('aria-pressed',selected ? 'true' : 'false');
     const letter = el.querySelector('.opt-letter');
+    const icon = el.querySelector('.opt-icon');
     if(letter) letter.textContent = selected && isMultiSelectQuestion(qid) ? '✓' : getOptionLabel(idx);
+    if(icon && isMultiSelectQuestion(qid)) icon.textContent = selected ? '✓' : (QUESTIONS[qid]?.opts?.[idx]?.icon || getOptionLabel(idx));
   });
   const nb = document.getElementById('btn-next');
   if(nb) nb.disabled = getSelectedIndexes(qid).length === 0;
@@ -896,6 +999,14 @@ function advance(){
 
   let naturalNext = q.opts[selected[0]]?.next || 'RESULTS';
   let next = naturalNext;
+
+  if(naturalNext === 'EMERGENCY'){
+    state.screen = 'emergency';
+    pendingOpt = null;
+    pendingOpts = [];
+    render();
+    return;
+  }
 
   if(qid === 'start'){
     const sections = selected.map(idx=>q.opts[idx]?.next).filter(Boolean);
@@ -943,29 +1054,75 @@ function goBack(){
 // ═══════════════════════════════════════════════════
 // RESULTS
 // ═══════════════════════════════════════════════════
-function renderResults(){
+function renderEmergency(){
+  return `
+  <div class="workspace">
+    ${renderAssessmentPanel(0,'Emergency screening')}
+    <main class="console">
+      <div class="emergency-screen">
+        <div class="emergency-icon">🚨</div>
+        <h2>Seek Emergency Medical Care</h2>
+        <p>You indicated symptoms that may require immediate medical attention. Please call <strong>911</strong> or go to the nearest emergency room. Do not rely on this tool for emergency situations.</p>
+        <div class="emergency-actions">
+          <button class="btn-primary" onclick="window.open('tel:911','_self')">Call 911</button>
+          <button class="btn-secondary" onclick="restart()">Start Over</button>
+          <button class="btn-link" onclick="continueAnyway()">Continue anyway (not recommended)</button>
+        </div>
+      </div>
+    </main>
+    ${renderSidePanel()}
+  </div>`;
+}
+
+function continueAnyway(){
+  state.screen = 'quiz';
+  state.history = [{
+    qid:'redflag',
+    optIdx:3,
+    optIdxs:[3],
+    next:'start',
+    naturalNext:'start',
+    scores:{},
+    beforeQueue:[],
+    beforeSharedNext:null
+  }];
+  pendingOpt = null;
+  pendingOpts = [];
+  render();
+}
+
+function getAnalysisSummary(){
+  const tags = getSymptomTags();
+  const matchCount = Object.values(state.scores).filter(v=>v>0).length;
+  const topMatch = getRankedMatches(1)[0];
+  return {tags, matchCount, topMatch};
+}
+
+function renderResultsContent(){
   const ranked = Object.entries(state.scores)
     .filter(([,v])=>v>0)
     .sort(([,a],[,b])=>b-a)
     .slice(0,3);
 
   if(ranked.length===0){
-    return `<div class="results-wrap"><div class="card" style="text-align:center;padding:2.5rem;border-radius:14px">
-      <h2>No Clear Match</h2>
-      <p style="color:var(--muted);margin-top:.75rem">Based on your answers, we couldn't identify a likely condition. Please consult a healthcare provider for proper evaluation.</p>
-      <button class="btn-restart" onclick="restart()">Start Over</button></div></div>`;
+    return `<div class="analysis-summary">
+      <h3>No Clear Match</h3>
+      <p style="color:var(--muted);line-height:1.55">Based on your answers, we couldn't identify a likely condition. Please consult a healthcare provider for proper evaluation.</p>
+      <button class="btn-restart" onclick="restart()" style="margin-top:1rem">Start Over</button>
+    </div>`;
   }
 
   const maxScore = ranked[0][1];
   const hasEmergency = ranked.some(([k])=>CONDITIONS[k]&&CONDITIONS[k].urgency==='high');
-
+  const summary = getAnalysisSummary();
   const ranks = ['Most Likely','Also Possible','Also Consider'];
   const rankClasses = ['r1','r2','r3'];
 
-  let html = `<div class="results-wrap">
-  <div class="res-header">
-    <div class="res-title">Your Results</div>
-    <p class="res-sub">Based on your symptoms, here are the most likely conditions. These results are for educational purposes only and are not a diagnosis.</p>
+  let html = `
+  <div class="analysis-summary">
+    <h3>Symptom Analysis Complete</h3>
+    <p style="color:var(--soft);font-size:.86rem;line-height:1.5">Analyzed <strong>${state.history.length}</strong> responses across <strong>${summary.matchCount}</strong> condition signals. Relative likelihood scores below are educational estimates, not clinical diagnoses.</p>
+    <div class="analysis-tags">${summary.tags.map(t=>`<span class="analysis-tag">${escapeHtml(t)}</span>`).join('')}</div>
   </div>`;
 
   if(hasEmergency){
@@ -979,61 +1136,114 @@ function renderResults(){
     const barClass = pct>=70?'mhigh':pct>=40?'mmed':'mlow';
     const urgClass = c.urgency==='high'?'u-high':c.urgency==='mod'?'u-mod':'u-low';
     const urgLabel = c.urgency==='high'?'Seek Medical Care Soon':c.urgency==='mod'?'See a Doctor':'Generally Not Urgent';
+    const confidence = pct>=75?'Strong signal':pct>=45?'Moderate signal':'Possible match';
 
     html += `
     <div class="res-card ${idx===0?'top':''}">
       <div class="res-card-header">
         <div>
-          <div class="res-cat">${c.cat}</div>
-          <div class="res-name">${c.name}</div>
+          <div class="res-cat">${escapeHtml(c.cat)}</div>
+          <div class="res-name">${escapeHtml(c.name)}</div>
         </div>
         <div style="text-align:right">
           <div class="rank-pill ${rankClasses[idx]}">${ranks[idx]}</div>
-          <div class="match-pct" style="margin-top:.25rem">${pct}% match</div>
+          <div class="match-pct" style="margin-top:.25rem">${pct}% relative likelihood</div>
+          <div class="match-confidence">${confidence}</div>
         </div>
       </div>
       <div class="match-bar-wrap"><div class="match-bar-fill ${barClass}" style="width:${pct}%"></div></div>
-      <div class="res-desc">${c.desc}</div>
+      <div class="res-desc">${escapeHtml(c.desc)}</div>
 
-      <div class="sec-label" onclick="toggleSection('sym${idx}')" id="lbl-sym${idx}">
+      <div class="sec-label" onclick="toggleSection('sym${idx}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleSection('sym${idx}')}" tabindex="0" role="button" aria-expanded="false" id="lbl-sym${idx}">
         <svg width="8" height="12" viewBox="0 0 8 12"><path d="M1 1l6 5-6 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
-        Common Symptoms
+        Common Symptoms (${c.symptoms.length})
       </div>
       <div class="list-panel" id="sym${idx}">
-        <div class="list">${c.symptoms.map(s=>`<div class="list-item sym">${s}</div>`).join('')}</div>
+        <div class="list">${c.symptoms.map(s=>`<div class="list-item sym">${escapeHtml(s)}</div>`).join('')}</div>
       </div>
 
-      <div class="sec-label" onclick="toggleSection('trt${idx}')" id="lbl-trt${idx}">
+      <div class="sec-label" onclick="toggleSection('trt${idx}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleSection('trt${idx}')}" tabindex="0" role="button" aria-expanded="false" id="lbl-trt${idx}">
         <svg width="8" height="12" viewBox="0 0 8 12"><path d="M1 1l6 5-6 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
-        Care Options
+        Care Options (${c.treatments.length})
       </div>
       <div class="list-panel" id="trt${idx}">
-        <div class="list">${c.treatments.map(t=>`<div class="list-item trt">${t}</div>`).join('')}</div>
+        <div class="list">${c.treatments.map(t=>`<div class="list-item trt">${escapeHtml(t)}</div>`).join('')}</div>
       </div>
 
       <div>
         <div class="urgency ${urgClass}">${urgLabel}</div>
-        <div class="u-note">${c.urgencyNote}</div>
+        <div class="u-note">${escapeHtml(c.urgencyNote)}</div>
       </div>
     </div>`;
   });
 
-  // Auto-expand the top result's sections
   html += `
   <div class="res-disclaimer">
-    <strong>Disclaimer:</strong> This symptom checker is for general educational information only. It is <strong>not a substitute for professional medical advice, diagnosis, or treatment</strong>. The results are based on limited information and may not accurately reflect your condition. Always consult a qualified healthcare professional for any health concerns. If you believe you are experiencing a medical emergency, <strong>call 911 immediately</strong>.
+    <strong>Disclaimer:</strong> This symptom checker is for general educational information only. It is <strong>not a substitute for professional medical advice, diagnosis, or treatment</strong>. Always consult a qualified healthcare professional. If you believe you are experiencing a medical emergency, <strong>call 911 immediately</strong>.
   </div>
-  <button class="btn-restart" onclick="restart()">Check Different Symptoms</button></div>`;
+  <button class="btn-restart" onclick="restart()">Check Different Symptoms</button>`;
 
   return html;
+}
+
+function renderResults(){
+  const main = `
+  <main class="console results-workspace">
+    <div class="console-head">
+      <div>
+        <div class="kicker">Analysis Results</div>
+        <div class="console-title">Your Symptom Analysis</div>
+        <p class="console-copy">Top matches based on your responses across ${Object.keys(CONDITIONS).length} conditions in our database.</p>
+      </div>
+      <div class="progress-chip">Complete<div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div></div>
+    </div>
+    <div class="results-main">${renderResultsContent()}</div>
+  </main>`;
+  return renderAppShell(main, 100, 'Analysis complete');
 }
 
 function toggleSection(id){
   const panel = document.getElementById(id);
   const lbl = document.getElementById('lbl-'+id);
   if(!panel) return;
-  panel.classList.toggle('open');
-  lbl.classList.toggle('open');
+  const isOpen = panel.classList.toggle('open');
+  if(lbl){
+    lbl.classList.toggle('open',isOpen);
+    lbl.setAttribute('aria-expanded',isOpen?'true':'false');
+  }
+}
+
+function bindKeyboardNav(){
+  document.removeEventListener('keydown',handleKeyNav);
+  if(state.screen==='quiz') document.addEventListener('keydown',handleKeyNav);
+}
+
+function handleKeyNav(e){
+  if(state.screen!=='quiz') return;
+  const qid = getCurrentQuestionId();
+  const q = QUESTIONS[qid];
+  if(!q) return;
+  const opts = document.querySelectorAll('.opt');
+  if(!opts.length) return;
+
+  if(e.key>='1' && e.key<='9'){
+    const idx = parseInt(e.key,10)-1;
+    if(idx < q.opts.length){e.preventDefault();selectOpt(idx);}
+    return;
+  }
+  if(e.key==='Enter'){
+    const btn = document.getElementById('btn-next');
+    if(btn && !btn.disabled){e.preventDefault();advance();}
+    return;
+  }
+  if(e.key==='ArrowDown' || e.key==='ArrowUp'){
+    e.preventDefault();
+    const current = getSelectedIndexes(qid);
+    let idx = current.length ? current[0] : -1;
+    idx = e.key==='ArrowDown' ? Math.min(idx+1,q.opts.length-1) : Math.max(idx-1,0);
+    selectOpt(idx);
+    opts[idx]?.focus();
+  }
 }
 
 function restart(){
@@ -1043,19 +1253,21 @@ function restart(){
 
 function render(){
   const app = document.getElementById('app');
-  if(state.screen==='quiz') app.innerHTML = renderQuiz();
-  else {
-    app.innerHTML = renderResults();
-    // Auto-expand top result
+  if(state.screen==='emergency') app.innerHTML = renderEmergency();
+  else if(state.screen==='quiz') app.innerHTML = renderQuiz();
+  else app.innerHTML = renderResults();
+  app.className = 'fade-in';
+  updateStatusPill();
+  bindKeyboardNav();
+  if(state.screen==='results'){
     setTimeout(()=>{
       ['sym0','trt0'].forEach(id=>{
         const p = document.getElementById(id);
         const l = document.getElementById('lbl-'+id);
-        if(p){p.classList.add('open');if(l)l.classList.add('open');}
+        if(p){p.classList.add('open');if(l){l.classList.add('open');l.setAttribute('aria-expanded','true');}}
       });
     },50);
   }
-  app.className = 'fade-in';
 }
 
 render();
