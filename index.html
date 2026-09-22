@@ -3,230 +3,339 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Qurest — Clinical Symptom Assessment</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='8' fill='%233b6fd9'/%3E%3Cpath d='M32 14v36M18 30h28' stroke='white' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E">
+  <title>Qurest — Symptom interview</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230b3f3b'/%3E%3Crect x='58' width='6' height='64' fill='%23dff25a'/%3E%3Ctext x='30' y='46' text-anchor='middle' font-family='Georgia,serif' font-size='40' font-weight='700' fill='%23f4f7f2'%3EQ%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Besley:ital,wght@0,500;0,700;1,500;1,700&family=Karla:ital,wght@0,400;0,500;0,700;1,400;1,500&display=swap" rel="stylesheet">
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     :root{
-      --bg:#0c0e12;--surface:#14171d;--surface-2:#1a1e26;--ink:#eceef2;--muted:#8b939e;--soft:#b4bcc8;
-      --line:#2a3038;--line-soft:#22262e;
-      --accent:#3b6fd9;--accent-hover:#4d7fe6;--accent-muted:rgba(59,111,217,.12);
-      --warning:#c9a227;--danger:#c44;--success:#3d9a6a;
-      --radius:6px;--shadow:0 1px 3px rgba(0,0,0,.35);
+      --paper:#e4efe8;
+      --sheet:#f7faf6;
+      --ink:#14221c;
+      --ink-soft:#3d5248;
+      --rule:#c5d5cc;
+      --rule-strong:#8aa898;
+      --teal:#0e6b62;
+      --teal-deep:#0b3f3b;
+      --mark:#dff25a;
+      --alert:#8e241c;
+      --alert-wash:#fdecea;
+      --spine:16px;
     }
+    html{color-scheme:light}
     body{
       min-height:100vh;color:var(--ink);
-      font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
-      background:var(--bg);
-      font-size:15px;line-height:1.5;
-      letter-spacing:-.01em;overflow-x:clip;
+      font-family:Karla,"Avenir Next","Segoe UI",sans-serif;
+      background:var(--paper);
+      font-size:17px;line-height:1.5;
+      padding-left:var(--spine);
       -webkit-font-smoothing:antialiased;
     }
-    header{
-      position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;
-      gap:1rem;padding:.875rem 1.25rem;border-bottom:1px solid var(--line);
-      background:rgba(12,14,18,.95);backdrop-filter:blur(12px);
+    ::selection{background:var(--mark);color:var(--ink)}
+    .spine{
+      position:fixed;left:0;top:0;bottom:0;width:var(--spine);z-index:40;
+      background:linear-gradient(var(--mark),var(--mark)) right/3px 100% no-repeat,var(--teal-deep);
     }
-    .brand{display:flex;align-items:center;gap:.75rem;min-width:0}
-    .logo{
-      width:32px;height:32px;border-radius:var(--radius);
-      display:flex;align-items:center;justify-content:center;
-      background:var(--accent);color:#fff;font-size:.95rem;font-weight:700;flex-shrink:0;
+    .skip{
+      position:absolute;left:-999px;top:0;
     }
-    .header-text{min-width:0}
-    .header-text h1{font-size:1rem;font-weight:600;letter-spacing:-.02em}
-    .header-text p{font-size:.75rem;color:var(--muted);margin-top:.1rem}
-    .status-line{font-size:.75rem;color:var(--muted);white-space:nowrap}
-    .container{max-width:1040px;margin:0 auto;padding:1.25rem 1.25rem 2rem}
-    .disclaimer{
-      display:flex;align-items:flex-start;gap:.65rem;margin-bottom:1.25rem;padding:.75rem 1rem;
-      border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:var(--radius);
-      color:var(--soft);background:var(--surface);font-size:.8rem;line-height:1.5;
+    .skip:focus{
+      left:calc(var(--spine) + .8rem);top:.8rem;z-index:50;
+      background:var(--mark);color:var(--ink);padding:.45rem .7rem;text-decoration:none;
     }
-    .disclaimer .di{display:none}
+    .masthead{
+      display:flex;align-items:flex-end;justify-content:space-between;gap:1.25rem;
+      padding:1.15rem 1.5rem .9rem 1.6rem;
+      border-bottom:3px solid var(--ink);
+      box-shadow:0 1px 0 var(--teal);
+    }
+    .form-code{
+      font-weight:700;font-size:.78rem;letter-spacing:.14em;
+      color:var(--teal);margin-bottom:.15rem;
+    }
+    h1{
+      font-family:Besley,Georgia,"Iowan Old Style",serif;
+      font-weight:700;font-size:clamp(2.5rem,5vw,3.7rem);
+      line-height:.84;letter-spacing:-.03em;
+    }
+    .masthead-sub{
+      margin-top:.45rem;font-size:1.02rem;color:var(--ink-soft);max-width:36rem;
+    }
+    .stamp{
+      flex-shrink:0;border:2px solid var(--alert);color:var(--alert);
+      font-family:Besley,Georgia,serif;font-style:italic;font-weight:700;
+      font-size:1rem;line-height:1.15;text-align:center;
+      padding:.4rem .7rem .45rem;min-width:7.5rem;
+      transform:rotate(-1.5deg);
+    }
+    body[data-screen="emergency"] .stamp{
+      background:var(--alert);color:#fff8f6;transform:none;
+    }
+    .container{max-width:1080px;margin:0 auto;padding:1.15rem 1.4rem 2.5rem}
+    .preface{
+      max-width:68ch;margin:0 0 1.35rem;color:var(--ink-soft);font-size:.98rem;
+    }
+    .preface span{
+      font-family:Besley,Georgia,serif;font-style:italic;font-weight:700;
+      color:var(--ink);margin-right:.25rem;
+    }
     .workspace{
-      display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:1.25rem;align-items:start;min-width:0;
+      display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:1.6rem;align-items:start;
     }
-    .console,.clinical-sidebar,.res-card{
-      border:1px solid var(--line);background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);
+    .console{
+      background:var(--sheet);border-left:8px solid var(--teal);min-width:0;
     }
-    .console{display:flex;flex-direction:column;min-width:0}
-    .console-head{
-      padding:1.25rem 1.25rem 1rem;border-bottom:1px solid var(--line);
+    .console:has(.emergency-screen){
+      border-left-color:var(--alert);background:#fff8f6;
     }
-    .kicker{font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:.5rem}
-    .console-title{font-size:1.2rem;font-weight:600;line-height:1.35;letter-spacing:-.02em;color:var(--ink)}
-    .console-copy{color:var(--muted);font-size:.875rem;line-height:1.5;margin-top:.5rem}
-    .progress-chip{color:var(--muted);font-size:.75rem;font-weight:500;margin-top:1rem}
-    .progress-bar{height:4px;background:var(--line-soft);border-radius:2px;overflow:hidden;margin-top:.4rem}
-    .progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s ease}
-    .choice-grid{display:flex;flex-direction:column;gap:.5rem;padding:1rem 1.25rem 1.25rem}
+    .console-head{padding:1.3rem 1.35rem 1.05rem}
+    .kicker-row{display:flex;align-items:baseline;gap:.55rem;flex-wrap:wrap;margin-bottom:.7rem}
+    .kicker{
+      display:inline-block;font-family:Besley,Georgia,serif;font-style:italic;font-weight:500;
+      font-size:1.02rem;letter-spacing:0;text-transform:none;color:var(--ink);
+      background:var(--mark);padding:.02rem .42rem .12rem;
+    }
+    .kicker-of{font-size:.92rem;color:var(--ink-soft)}
+    .console-title{
+      font-family:Besley,Georgia,serif;font-weight:700;
+      font-size:clamp(1.5rem,2.5vw,2.05rem);line-height:1.16;letter-spacing:-.02em;
+    }
+    .console-copy{color:var(--ink-soft);font-size:1.02rem;line-height:1.45;margin-top:.55rem}
+    .progress-chip{margin-top:1rem}
+    .progress-bar{height:7px;background:#d5e3db;overflow:hidden}
+    .progress-fill{height:100%;background:var(--teal);transition:width .25s ease}
+    .choice-grid{display:flex;flex-direction:column;padding:0 1.15rem .4rem}
     .opt{
-      display:flex;align-items:flex-start;gap:.75rem;padding:.875rem 1rem;
-      border:1px solid var(--line);border-radius:var(--radius);cursor:pointer;text-align:left;width:100%;
-      background:var(--surface-2);color:var(--ink);font-size:.875rem;line-height:1.45;
-      transition:border-color .15s,background .15s;
+      display:flex;align-items:flex-start;gap:.85rem;padding:.85rem .25rem;
+      border:none;border-bottom:1px solid var(--rule);cursor:pointer;text-align:left;width:100%;
+      background:transparent;color:var(--ink);font-size:1.02rem;line-height:1.4;
     }
-    .opt:hover{border-color:#3a4454;background:#1e222a}
-    .opt.selected{border-color:var(--accent);background:var(--accent-muted)}
+    .opt:hover{background:#eef5f1}
+    .opt.selected{background:#e7f4a4}
     .opt-marker{
-      width:18px;height:18px;border:2px solid #4a5568;border-radius:50%;flex-shrink:0;margin-top:.15rem;
-      transition:border-color .15s,background .15s;
+      width:1.7rem;height:1.7rem;border:1.5px solid var(--ink);
+      display:grid;place-items:center;flex-shrink:0;margin-top:.05rem;
+      font-weight:700;font-size:.82rem;font-variant-numeric:tabular-nums;
     }
-    .opt.selected .opt-marker{border-color:var(--accent);background:var(--accent);box-shadow:inset 0 0 0 3px var(--surface-2)}
+    .opt.selected .opt-marker{background:var(--ink);color:var(--mark)}
     .opt strong{font-weight:500;display:block}
-    .opt small{display:block;color:var(--muted);font-size:.8rem;margin-top:.2rem;line-height:1.4}
+    .opt.selected strong{font-weight:700}
+    .opt small{display:block;color:var(--ink-soft);font-size:.9rem;margin-top:.15rem;line-height:1.35}
     .opt>span:last-child{min-width:0;flex:1}
-    .composer{border-top:1px solid var(--line);padding:1rem 1.25rem;background:var(--surface-2)}
+    .composer{border-top:1px solid var(--rule);padding:.95rem 1.35rem 1.1rem;background:var(--sheet)}
+    .key-hint{font-size:.86rem;color:var(--ink-soft);margin-bottom:.7rem}
     .composer-actions{display:flex;align-items:center;justify-content:space-between;gap:.75rem}
-    .action-left,.action-right{display:flex;align-items:center;gap:.5rem}
-    button{font:inherit;letter-spacing:0}
+    .action-left,.action-right{display:flex;align-items:center;gap:.9rem}
+    button{font:inherit;color:inherit}
     .btn-primary,.btn-next,.btn-restart{
-      border:none;border-radius:var(--radius);cursor:pointer;font-size:.875rem;font-weight:600;
-      background:var(--accent);color:#fff;padding:.7rem 1.25rem;transition:background .15s;
+      border:none;border-radius:0;cursor:pointer;font-size:1rem;font-weight:700;
+      background:var(--teal);color:#f4faf7;padding:.72rem 1.15rem;
     }
-    .btn-primary:hover:not(:disabled),.btn-next:hover:not(:disabled),.btn-restart:hover{background:var(--accent-hover)}
+    .btn-primary:hover:not(:disabled),.btn-next:hover:not(:disabled),.btn-restart:hover{background:#0a524c}
     .btn-secondary,.btn-back{
-      border:1px solid var(--line);border-radius:var(--radius);cursor:pointer;font-size:.875rem;font-weight:500;
-      background:transparent;color:var(--soft);padding:.65rem 1rem;transition:border-color .15s,color .15s;
+      border:none;border-bottom:1px solid var(--ink);border-radius:0;cursor:pointer;
+      background:transparent;color:var(--ink);padding:.35rem 0;font-size:1rem;font-weight:500;
     }
-    .btn-secondary:hover:not(:disabled),.btn-back:hover:not(:disabled){border-color:#4a5568;color:var(--ink)}
-    .btn-link{border:none;background:transparent;color:var(--muted);padding:.5rem;font-size:.8rem;cursor:pointer}
+    .btn-secondary:hover:not(:disabled),.btn-back:hover:not(:disabled){color:var(--teal);border-bottom-color:var(--teal)}
+    .btn-link{
+      border:none;background:transparent;color:var(--ink-soft);padding:.35rem 0;
+      font-size:.92rem;cursor:pointer;text-decoration:underline;text-underline-offset:.18em;
+    }
     .btn-link:hover{color:var(--ink)}
-    button:disabled{opacity:.4;cursor:not-allowed}
-    .clinical-sidebar{padding:1rem;display:flex;flex-direction:column;gap:1.25rem;position:sticky;top:4.5rem}
-    .sidebar-block{display:flex;flex-direction:column;gap:.5rem}
-    .side-label{font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
-    .progress-caption{font-size:.8rem;color:var(--soft);margin-top:.35rem}
-    .match-list{display:flex;flex-direction:column;gap:.5rem}
-    .match-preview{
-      padding:.75rem;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface-2);
+    button:disabled{opacity:.38;cursor:not-allowed}
+    .btn-restart{margin-top:1.1rem}
+    .clinical-sidebar{
+      padding:.15rem 0 0 .15rem;display:flex;flex-direction:column;gap:1.35rem;
+      position:sticky;top:1rem;background:transparent;border:none;
     }
-    .match-preview.top{border-color:rgba(59,111,217,.45);background:var(--accent-muted)}
-    .match-head{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem;margin-bottom:.4rem}
-    .match-name{font-size:.84rem;font-weight:500;line-height:1.3;overflow-wrap:anywhere}
-    .match-value{font-size:.75rem;color:var(--muted);font-weight:500;white-space:nowrap;flex-shrink:0}
-    .match-track{height:3px;border-radius:2px;background:var(--line-soft);overflow:hidden}
-    .match-fill{height:100%;background:var(--accent);border-radius:2px}
-    .match-empty{font-size:.8rem;color:var(--muted);line-height:1.45;padding:.5rem 0}
-    .path-list{display:flex;flex-direction:column;gap:.35rem;max-height:200px;overflow-y:auto}
-    .path-item{font-size:.78rem;color:var(--muted);line-height:1.4;padding:.35rem 0;border-bottom:1px solid var(--line-soft)}
+    .sidebar-block{display:flex;flex-direction:column;gap:.4rem}
+    .side-label{
+      font-family:Besley,Georgia,serif;font-style:italic;font-weight:500;
+      font-size:1.08rem;color:var(--ink);text-transform:none;letter-spacing:0;
+    }
+    .progress-caption{font-size:.92rem;color:var(--ink-soft)}
+    .match-list{display:flex;flex-direction:column}
+    .match-preview{padding:.6rem 0;border:none;border-bottom:1px solid var(--rule);background:transparent}
+    .match-head{display:flex;justify-content:space-between;align-items:baseline;gap:.6rem;margin-bottom:.35rem}
+    .match-name{font-size:.98rem;font-weight:500;line-height:1.3}
+    .match-preview.top .match-name{
+      font-weight:700;
+      background-image:linear-gradient(transparent 64%, var(--mark) 64%);
+      -webkit-box-decoration-break:clone;box-decoration-break:clone;
+    }
+    .match-value{font-size:.85rem;font-weight:700;color:var(--teal);font-variant-numeric:tabular-nums;white-space:nowrap}
+    .match-track{height:6px;background:#d5e3db;overflow:hidden}
+    .match-fill{height:100%;background:var(--teal)}
+    .match-empty{font-size:.95rem;color:var(--ink-soft);line-height:1.45;padding:.2rem 0 .4rem}
+    .path-list{display:flex;flex-direction:column;max-height:240px;overflow-y:auto}
+    .path-item{font-size:.92rem;color:var(--ink-soft);line-height:1.4;padding:.4rem 0;border-bottom:1px solid #d5e3db}
     .path-item:last-child{border-bottom:none}
-    .fade-in{animation:fi .2s ease}
+    .fade-in{animation:fi .18s ease}
     @keyframes fi{from{opacity:0}to{opacity:1}}
-    .results-main{padding:1.25rem}
-    .analysis-summary{
-      border:1px solid var(--line);border-radius:var(--radius);padding:1rem 1.1rem;margin-bottom:1.25rem;
-      background:var(--surface-2);
+    .results-main{padding:0 1.35rem 1.35rem}
+    .analysis-summary{padding:0 0 1rem;margin-bottom:.35rem;border-bottom:1px dashed var(--rule-strong)}
+    .analysis-summary h3{
+      font-family:Besley,Georgia,serif;font-style:italic;font-weight:500;font-size:1.28rem;margin-bottom:.3rem;
     }
-    .analysis-summary h3{font-size:.95rem;font-weight:600;margin-bottom:.35rem}
-    .analysis-summary p{font-size:.84rem;color:var(--muted);line-height:1.5}
-    .analysis-tags{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.6rem}
-    .analysis-tag{font-size:.72rem;padding:.25rem .5rem;border-radius:3px;border:1px solid var(--line);color:var(--muted);background:var(--surface)}
-    .emergency-screen{padding:2rem 1.5rem;text-align:left;max-width:520px;margin:0 auto}
-    .emergency-screen h2{font-size:1.25rem;font-weight:600;margin-bottom:.75rem;color:var(--danger)}
-    .emergency-screen p{color:var(--soft);line-height:1.6;margin-bottom:1.25rem;font-size:.9rem}
-    .emergency-actions{display:flex;gap:.6rem;flex-wrap:wrap}
-    .res-card{padding:1.15rem;margin-bottom:.75rem}
-    .res-card.top{border-color:rgba(59,111,217,.4)}
-    .res-card-header{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;margin-bottom:.75rem}
-    .rank-pill{padding:.2rem .55rem;border-radius:3px;font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
-    .r1{background:var(--accent-muted);color:#8ab4f8;border:1px solid rgba(59,111,217,.3)}
-    .r2,.r3{background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}
-    .match-pct{font-size:.75rem;color:var(--muted)}
-    .res-name{font-size:1.05rem;font-weight:600;margin-bottom:.2rem}
-    .res-cat{font-size:.7rem;color:var(--accent);font-weight:500;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.35rem}
-    .match-bar-wrap{height:3px;background:var(--line-soft);border-radius:2px;overflow:hidden;margin-bottom:.85rem}
-    .match-bar-fill{height:100%;border-radius:2px}
-    .mhigh{background:var(--accent)}.mmed{background:var(--warning)}.mlow{background:#5a6270}
-    .res-desc{font-size:.84rem;color:var(--muted);line-height:1.55;margin-bottom:.75rem}
+    .analysis-summary p{font-size:1rem;color:var(--ink-soft);line-height:1.5}
+    .emergency-screen{padding:1.6rem 1.4rem 1.7rem;max-width:40rem}
+    .emergency-screen h2{
+      font-family:Besley,Georgia,serif;font-size:clamp(1.8rem,4vw,2.45rem);
+      line-height:1.05;font-weight:700;color:var(--alert);margin-bottom:.7rem;letter-spacing:-.02em;
+    }
+    .emergency-screen p{color:var(--ink);line-height:1.55;margin-bottom:1.15rem;font-size:1.05rem}
+    .emergency-actions{display:flex;gap:1rem;flex-wrap:wrap;align-items:center}
+    .emergency-actions .btn-primary{background:var(--alert);color:#fff8f6}
+    .emergency-actions .btn-primary:hover{background:#6e1b16}
+    .emergency-continue{display:inline-block;margin-top:1rem}
+    .res-card{padding:1.15rem 0 1.2rem;margin:0;background:transparent;border:none;border-top:1px solid var(--rule)}
+    .res-card.top{border-top:3px solid var(--ink)}
+    .res-card-header{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;margin-bottom:.7rem}
+    .res-score{text-align:right;flex-shrink:0}
+    .rank-pill{
+      display:inline-block;padding:.12rem .4rem;font-family:Besley,Georgia,serif;
+      font-style:italic;font-size:.95rem;font-weight:500;
+    }
+    .r1{background:var(--mark);color:var(--ink)}
+    .r2,.r3{color:var(--ink-soft)}
+    .match-pct{font-size:.95rem;font-weight:700;font-variant-numeric:tabular-nums;margin-top:.2rem}
+    .match-confidence{font-size:.82rem;color:var(--ink-soft);margin-top:.1rem}
+    .res-name{font-family:Besley,Georgia,serif;font-size:1.55rem;font-weight:700;line-height:1.15;letter-spacing:-.02em}
+    .res-card.top .res-name{
+      background-image:linear-gradient(transparent 64%, var(--mark) 64%);
+      -webkit-box-decoration-break:clone;box-decoration-break:clone;
+    }
+    .res-cat{font-size:.88rem;color:var(--teal);font-weight:700;margin-bottom:.2rem}
+    .match-bar-wrap{height:6px;background:#d5e3db;overflow:hidden;margin:.15rem 0 .85rem}
+    .match-bar-fill{height:100%}
+    .mhigh{background:var(--teal)}.mmed{background:#c4892a}.mlow{background:var(--rule-strong)}
+    .res-desc{font-size:1.02rem;color:#24352d;line-height:1.55;margin-bottom:.35rem}
     .sec-label{
-      font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);
-      margin:.75rem 0 .4rem;display:flex;align-items:center;gap:.4rem;cursor:pointer;user-select:none;
+      font-family:Besley,Georgia,serif;font-style:italic;font-weight:500;font-size:1.05rem;
+      text-transform:none;letter-spacing:0;color:var(--ink);
+      margin:.85rem 0 .35rem;display:flex;align-items:center;gap:.45rem;cursor:pointer;user-select:none;width:fit-content;
     }
-    .sec-label svg{transition:transform .15s;flex-shrink:0}.sec-label.open svg{transform:rotate(90deg)}
+    .sec-label svg{transition:transform .15s;flex-shrink:0}
+    .sec-label.open svg{transform:rotate(90deg)}
     .list-panel{display:none}.list-panel.open{display:block}
-    .list{display:flex;flex-direction:column;gap:.3rem;margin-bottom:.65rem}
-    .list-item{display:flex;align-items:flex-start;gap:.5rem;font-size:.82rem;line-height:1.45;color:var(--soft);padding-left:.25rem}
+    .list{display:flex;flex-direction:column;gap:.28rem;margin:0 0 .7rem .15rem}
+    .list-item{display:flex;align-items:flex-start;gap:.55rem;font-size:.98rem;line-height:1.45;color:#24352d}
     .list-item.sym::before,.list-item.trt::before{
-      content:"";width:4px;height:4px;border-radius:1px;background:var(--muted);flex-shrink:0;margin-top:.55rem;
+      content:"";width:.45rem;height:.45rem;background:var(--teal);flex-shrink:0;margin-top:.45rem;
     }
-    .urgency{display:inline-block;padding:.3rem .6rem;border-radius:var(--radius);font-size:.75rem;font-weight:500;margin-top:.25rem}
-    .u-low{background:rgba(61,154,106,.12);color:#7bc49a;border:1px solid rgba(61,154,106,.25)}
-    .u-mod{background:rgba(201,162,39,.1);color:#d4b85a;border:1px solid rgba(201,162,39,.25)}
-    .u-high{background:rgba(204,68,68,.12);color:#e88;border:1px solid rgba(204,68,68,.25)}
-    .u-note,.res-disclaimer{font-size:.78rem;color:var(--muted);margin-top:.5rem;line-height:1.5;padding:.65rem .75rem;background:var(--surface-2);border-radius:var(--radius);border:1px solid var(--line)}
-    .emergency-banner{background:rgba(204,68,68,.1);border:1px solid rgba(204,68,68,.3);border-radius:var(--radius);padding:.85rem 1rem;margin-bottom:1rem;font-size:.84rem;color:#eaa;line-height:1.45}
-    .opt:focus-visible,.sec-label:focus-visible,.btn-next:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-
-    @media(min-width:901px){
-      .choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+    .urgency{
+      display:inline-block;padding:.2rem .45rem;font-family:Besley,Georgia,serif;
+      font-style:italic;font-size:.98rem;font-weight:500;margin-top:.35rem;border:1px solid currentColor;
+    }
+    .u-low{background:#e7f3e6;color:#1d5c32}
+    .u-mod{background:#fff4d4;color:#6a4808}
+    .u-high{background:var(--alert-wash);color:var(--alert)}
+    .u-note,.res-disclaimer{
+      font-size:.95rem;color:var(--ink-soft);margin-top:.65rem;line-height:1.5;
+      padding:.1rem 0 .1rem .75rem;background:transparent;border:none;border-left:3px solid var(--rule-strong);border-radius:0;
+    }
+    .res-disclaimer{margin-top:1.15rem}
+    .res-disclaimer strong,.u-note strong{color:var(--ink)}
+    .emergency-banner{
+      background:var(--alert-wash);border:none;border-left:4px solid var(--alert);
+      padding:.8rem .9rem;margin:1rem 0;font-size:.98rem;color:#5e1a14;line-height:1.45;
+    }
+    .opt:focus-visible,.sec-label:focus-visible,button:focus-visible,.skip:focus{
+      outline:2px solid var(--ink);outline-offset:3px;
+    }
+    .colophon{
+      max-width:1080px;margin:0 auto;padding:.85rem 1.4rem 2rem;
+      color:var(--ink-soft);font-size:.88rem;border-top:1px solid var(--rule-strong);
+    }
+    @media(min-width:701px){
+      body[data-screen="quiz"] .console{
+        display:flex;flex-direction:column;max-height:calc(100dvh - 16.2rem);
+      }
+      body[data-screen="quiz"] .choice-grid{
+        overflow-y:auto;min-height:0;
+        scrollbar-width:thin;scrollbar-color:var(--teal-deep) #d5e3db;
+      }
+      body[data-screen="quiz"] .console-head,
+      body[data-screen="quiz"] .composer{flex-shrink:0}
     }
     @media(max-width:900px){
       .workspace{grid-template-columns:1fr}
       .clinical-sidebar{display:none}
-      .clinical-sidebar.show-mobile{display:flex;position:static;margin-top:0}
+      .clinical-sidebar.show-mobile{
+        display:flex;position:static;margin-top:1.25rem;padding-top:1rem;border-top:1px dashed var(--rule-strong);
+      }
       .console-head .progress-chip{display:block}
     }
+    @media(min-width:901px){
+      .console-head .progress-chip{display:none}
+    }
+    @media(max-width:700px){
+      .stamp{transform:none}
+      .masthead{align-items:flex-start;gap:.75rem;padding:.8rem .9rem .65rem}
+      h1{font-size:2.15rem}
+    }
     @media(max-width:640px){
-      .container{padding:1rem .875rem 1.5rem}
-      header{padding:.75rem .875rem}
-      .header-text p{display:none}
-      .status-line{font-size:.7rem;max-width:42vw;overflow:hidden;text-overflow:ellipsis}
-      .disclaimer{font-size:.75rem;padding:.65rem .8rem;margin-bottom:1rem}
-      .console-head{padding:1rem;flex-shrink:0}
-      .console-title{font-size:1.1rem}
-      .console{display:flex;flex-direction:column;padding-bottom:0}
-      .choice-grid{
-        flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
-        padding:.75rem .875rem 1rem;
-        max-height:calc(100dvh - 17.5rem - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));
-      }
-      .console .composer{border-top:none;padding:0;display:none}
+      :root{--spine:10px}
+      .container{padding:1rem .9rem 1.4rem}
+      .masthead{padding:.75rem .8rem .6rem}
+      .masthead-sub{font-size:.95rem;margin-top:.25rem}
+      .preface{font-size:.92rem;margin-bottom:.85rem}
+      .console-head{padding:.85rem .9rem .55rem}
+      .console-title{font-size:1.32rem}
+      .kicker-row{margin-bottom:.4rem}
+      .choice-grid{padding:0 .55rem .25rem}
+      .opt{padding:.62rem .15rem}
+      .console .composer{display:none}
       #mobile-footer{
-        display:block;
-        position:fixed;left:0;right:0;bottom:0;z-index:50;
-        background:var(--surface);border-top:1px solid var(--line);
-        padding:.75rem .875rem calc(.75rem + env(safe-area-inset-bottom,0px));
-        box-shadow:0 -4px 20px rgba(0,0,0,.3);
+        display:block;position:fixed;left:var(--spine);right:0;bottom:0;z-index:50;
+        background:var(--sheet);border-top:3px solid var(--ink);
+        padding:.7rem .85rem calc(.75rem + env(safe-area-inset-bottom,0px));
       }
-      #mobile-footer .composer-actions{flex-direction:column-reverse;gap:.45rem}
-      #mobile-footer .action-left{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:.45rem}
-      #mobile-footer .action-right{width:100%}
-      #mobile-footer .btn-next{width:100%;min-height:46px}
-      #mobile-footer .btn-back,#mobile-footer .btn-secondary{min-height:42px;width:100%}
-      .results-main{padding:1rem}
-      .emergency-screen{padding:1.25rem .875rem}
-      .emergency-actions{flex-direction:column;width:100%}
-      .emergency-actions .btn-primary,.emergency-actions .btn-secondary{width:100%;min-height:46px;text-align:center}
-      .btn-restart{width:100%;min-height:46px;margin-top:.5rem}
-      .res-card-header{flex-direction:column;gap:.35rem}
+      #mobile-footer .key-hint{display:none}
+      #mobile-footer .composer-actions{flex-direction:row;align-items:center;gap:.7rem}
+      #mobile-footer .action-left{width:auto;display:flex;gap:.75rem;flex-shrink:0}
+      #mobile-footer .action-right{flex:1}
+      #mobile-footer .btn-next{width:100%;min-height:48px}
+      #mobile-footer .btn-back,#mobile-footer .btn-secondary{min-height:44px}
+      .results-main{padding:0 .9rem 1rem}
+      .emergency-screen{padding:1.15rem .9rem 1.3rem}
+      .emergency-actions{flex-direction:column;align-items:stretch}
+      .emergency-actions .btn-primary,.emergency-actions .btn-secondary{width:100%;min-height:48px;text-align:center}
+      .btn-restart{width:100%;min-height:48px}
+      .res-card-header{flex-direction:column;gap:.45rem}
+      .res-score{text-align:left}
+      .res-name{font-size:1.35rem}
+      body:has(#mobile-footer) .container{padding-bottom:6.5rem}
+      body:has(#mobile-footer) .colophon{margin-bottom:5.5rem}
+      .colophon{padding-left:.9rem;padding-right:.9rem}
+    }
+    @media(prefers-reduced-motion:reduce){
+      .fade-in{animation:none}
+      .progress-fill,.sec-label svg{transition:none}
     }
   </style>
 </head>
 <body>
 
-<header>
-  <div class="brand">
-    <div class="logo">+</div>
-    <div class="header-text">
-      <h1>Qurest</h1>
-      <p>Clinical symptom assessment</p>
-    </div>
+<a class="skip" href="#app">Skip to the question</a>
+<div class="spine" aria-hidden="true"></div>
+
+<header class="masthead">
+  <div class="masthead-main">
+    <p class="form-code">FORM Q–07</p>
+    <h1>Qurest</h1>
+    <p class="masthead-sub">For learning. Not a diagnosis.</p>
   </div>
-  <div class="status-line"><span class="status-text">Ready</span></div>
+  <p class="stamp" aria-live="polite"><span class="status-text">Just opened</span></p>
 </header>
 
 <div class="container">
-  <div class="disclaimer">
-    <span class="di">!</span>
-    <span><strong>Important:</strong> This tool is for educational purposes only and does not provide a medical diagnosis. Always consult a qualified healthcare provider for any health concerns. If you are experiencing a medical emergency, <strong>call 911 immediately</strong>.</span>
-  </div>
+  <p class="preface"><span>Note.</span> Your answers stay in this browser. Qurest cannot diagnose you. If this might be an emergency, call 911.</p>
   <div id="app"></div>
 </div>
+<footer class="colophon">Printed-form interview · nothing is saved or sent · call 911 for a real emergency</footer>
 
 <script>
 // ═══════════════════════════════════════════════════
@@ -276,7 +385,10 @@ const CONDITIONS = {
   tendonitis:{name:"Tendonitis / Overuse Injury",cat:"Musculoskeletal / Overuse",desc:"Inflammation or irritation of a tendon, often caused by repetitive motion, overtraining, or sudden increases in activity.",symptoms:["Pain near a joint with repeated use","Tenderness at the tendon attachment point","Pain with a specific motion such as lifting, gripping, or climbing stairs","Mild swelling or warmth","Stiffness after activity or in the morning","Symptoms often improve with rest and flare with overuse"],treatments:["Relative rest and temporary activity modification","Ice after aggravating activity","NSAIDs if appropriate","Gentle stretching and progressive strengthening","Bracing or taping for short-term support in some cases","Physical therapy for persistent or recurrent cases"],urgency:"low",urgencyNote:"Usually not urgent. Seek care if you cannot bear weight, cannot use the limb normally, heard a pop, or symptoms are not improving after a couple of weeks."},
   sleep_apnea:{name:"Obstructive Sleep Apnea (Risk Indicator)",cat:"Sleep / Breathing",desc:"A sleep-related breathing disorder in which the airway repeatedly narrows or closes during sleep, leading to poor-quality rest and daytime fatigue.",symptoms:["Loud habitual snoring","Witnessed pauses in breathing during sleep","Waking up gasping or choking","Unrefreshing sleep even after enough hours in bed","Daytime sleepiness or dozing off","Morning headaches","Trouble concentrating and irritability"],treatments:["Sleep study to confirm the diagnosis","CPAP therapy is the standard treatment","Weight management when applicable","Sleeping on your side instead of your back","Treat nasal obstruction or allergies","Oral appliances or specialist referral for selected patients"],urgency:"mod",urgencyNote:"See a doctor or sleep specialist for evaluation, especially if you are very sleepy during the day, have high blood pressure, or are told you stop breathing in your sleep."},
   dehydration:{name:"Dehydration",cat:"Fluid / General",desc:"A state where the body does not have enough fluid, often from heat, vomiting, diarrhea, fever, poor intake, or heavy exercise.",symptoms:["Thirst and dry mouth","Dark urine or peeing less often","Dizziness or lightheadedness","Fatigue, weakness, or headache","Rapid heartbeat","Dry skin or feeling overheated","Muscle cramps"],treatments:["Drink water and electrolyte-containing fluids","Oral rehydration solutions after vomiting or diarrhea","Rest and avoid overheating","Treat the underlying cause such as fever, stomach illness, or excessive sweating","IV fluids for severe dehydration","Monitor urine color and frequency as recovery signs"],urgency:"mod",urgencyNote:"Seek urgent care for confusion, fainting, inability to keep fluids down, very little urine, rapid breathing, or severe weakness. Young children and older adults can become dehydrated quickly."},
-  hypothyroidism:{name:"Hypothyroidism",cat:"Endocrine / Thyroid",desc:"A condition where the thyroid gland does not produce enough thyroid hormone, often causing slow metabolism and chronic fatigue.",symptoms:["Persistent fatigue and low energy","Weight gain or difficulty losing weight","Cold intolerance","Dry skin or hair changes","Constipation","Puffy face or swelling","Slowed thinking or depressed mood"],treatments:["Blood tests such as TSH and free T4 to confirm the diagnosis","Daily thyroid hormone replacement (levothyroxine) if diagnosed","Regular lab monitoring to adjust the dose","Address contributing factors such as iodine deficiency or autoimmune thyroid disease","Follow-up with primary care or endocrinology"],urgency:"low",urgencyNote:"Usually not an emergency, but it should be evaluated with blood tests. See a doctor if symptoms are persistent or worsening, especially if combined with swelling, hoarseness, or significant fatigue."}
+  hypothyroidism:{name:"Hypothyroidism",cat:"Endocrine / Thyroid",desc:"A condition where the thyroid gland does not produce enough thyroid hormone, often causing slow metabolism and chronic fatigue.",symptoms:["Persistent fatigue and low energy","Weight gain or difficulty losing weight","Cold intolerance","Dry skin or hair changes","Constipation","Puffy face or swelling","Slowed thinking or depressed mood"],treatments:["Blood tests such as TSH and free T4 to confirm the diagnosis","Daily thyroid hormone replacement (levothyroxine) if diagnosed","Regular lab monitoring to adjust the dose","Address contributing factors such as iodine deficiency or autoimmune thyroid disease","Follow-up with primary care or endocrinology"],urgency:"low",urgencyNote:"Usually not an emergency, but it should be evaluated with blood tests. See a doctor if symptoms are persistent or worsening, especially if combined with swelling, hoarseness, or significant fatigue."},
+  ear_infection:{name:"Ear infection",cat:"Ear / ENT",desc:"Pain and fullness in the ear, either in the middle ear after a cold or in the ear canal after water exposure. A clinician has to look in the ear to tell which it is.",symptoms:["Ear pain or a blocked, full feeling","Muffled hearing on that side","Fever, especially in children after a cold","Drainage from the ear","Pain when the outer ear is tugged (more typical of the ear canal)","Recent cold, allergies, or swimming"],treatments:["Pain relief such as acetaminophen or ibuprofen, if those are safe for you","Have a clinician look in the ear before starting antibiotics","Antibiotic ear drops are sometimes used for an outer-ear infection","Keep a swimmer's ear dry while it heals","Warm compress held over the ear for comfort"],urgency:"mod",urgencyNote:"Get the ear examined if pain, fever, drainage, or hearing loss is new. Go urgently for swelling behind the ear, a stiff neck, severe headache, confusion, or dizziness with vomiting."},
+  conjunctivitis:{name:"Pink eye (conjunctivitis)",cat:"Eye",desc:"Inflammation of the thin lining of the eyelid and the white of the eye. Viruses, bacteria, and allergies are the usual causes, and the eye looks pink.",symptoms:["Pink or red eye","Watery, sticky, or crusty discharge","Lashes stuck together after sleep","Itching, mostly when allergies are the cause","Often starts in one eye and may spread to the other","Vision stays basically normal"],treatments:["Wash hands often and don't share towels or pillowcases","Cool compress and preservative-free artificial tears for comfort","Antihistamine eye drops if the eyes are itchy and you also have hay fever","Antibiotic drops only if a clinician decides the cause is bacterial","Throw away mascara and replace contact lenses used during the infection"],urgency:"low",urgencyNote:"Get same-day care if vision drops, light hurts the eye, the eye is very painful, you wear contacts, or a newborn has a red eye. Simple pink eye without those features can often wait for a routine visit."},
+  chest_wall:{name:"Chest wall pain",cat:"Chest / Musculoskeletal",desc:"Soreness in the chest wall, often where a rib meets the breastbone. The spot hurts when pressed, twisted, or during a deep breath. It is a common cause of chest pain that is not a heart attack.",symptoms:["A tender spot you can find with a finger","Pain worse with twisting, reaching, coughing, or a deep breath","Pain that stays in one small area","Often follows a strain, a bout of coughing, or an awkward posture","Not a crushing pressure that comes on with walking"],treatments:["Ease the movement that stirs it up for a few days","A warm compress or ice, whichever feels better","Acetaminophen or an anti-inflammatory if those are safe for you","Most cases settle over days to a couple of weeks","Get examined if it is not improving or you are unsure"],urgency:"low",urgencyNote:"Call 911 for crushing chest pain, pain into the arm or jaw, sweating, fainting, or shortness of breath. The opening question of this interview is there to catch that pattern. If you are unsure whether chest pain is muscular, get checked in person."}
   };
 
 // ═══════════════════════════════════════════════════
@@ -298,8 +410,8 @@ const QUESTIONS = {
     sub:"Select every area that applies. Mixed symptoms will be checked together.",
     multi:true,
     opts:[
-      {t:"Head or neurological symptoms",sub:"Headache, dizziness, vision, balance",icon:"🧠",next:"head1",s:{}},
-      {t:"Chest or respiratory symptoms",sub:"Cough, breathing difficulty, sore throat",icon:"🫁",next:"resp1",s:{}},
+      {t:"Head, ear, or eye symptoms",sub:"Headache, dizziness, ear pain, red or crusty eye",icon:"🧠",next:"head1",s:{}},
+      {t:"Chest or respiratory symptoms",sub:"Cough, breathing, sore throat, or a sore spot on the chest",icon:"🫁",next:"resp1",s:{}},
       {t:"Stomach or digestive symptoms",sub:"Nausea, stomach pain, heartburn, bowel changes",icon:"🫃",next:"dig1",s:{}},
       {t:"Urinary symptoms",sub:"Painful urination, frequent urges, back pain",icon:"🫘",next:"uri1",s:{}},
       {t:"Skin symptoms",sub:"Rash, itching, redness, or lesions",icon:"🩹",next:"skin1",s:{}},
@@ -315,7 +427,27 @@ const QUESTIONS = {
       {t:"Severe, throbbing headache — often on one side",icon:"⚡",next:"head2",s:{migraine:9,tension_ha:2,hypertension:2,concussion:1}},
       {t:"Dull, pressure or tightening feeling around the whole head",icon:"🔄",next:"head2",s:{tension_ha:9,migraine:2,hypertension:1,sinusitis:5}},
       {t:"Dizziness or sensation that the room is spinning",icon:"🌀",next:"head2",s:{vertigo:10,hypertension:3,anemia:4,concussion:3}},
-      {t:"Headache combined with high blood pressure concerns",icon:"💉",next:"head2",s:{hypertension:10,migraine:2}}
+      {t:"Headache combined with high blood pressure concerns",icon:"💉",next:"head2",s:{hypertension:10,migraine:2}},
+      {t:"Ear pain, fullness, or muffled hearing",icon:"👂",next:"ear1",s:{ear_infection:8,common_cold:2,sinusitis:2}},
+      {t:"Red, crusty, or watery eyes",icon:"👁️",next:"eye1",s:{conjunctivitis:8,allergic_rhinitis:3}}
+    ]
+  },
+  ear1:{
+    text:"What is going on with the ear?",
+    opts:[
+      {t:"Ear pain or a blocked feeling, often after a cold",icon:"👂",next:"fever",s:{ear_infection:14,common_cold:2,sinusitis:2}},
+      {t:"The ear canal itches or hurts when I tug it, often after swimming",icon:"💧",next:"fever",s:{ear_infection:14}},
+      {t:"Muffled hearing or pressure, without strong pain",icon:"🔇",next:"fever",s:{common_cold:6,ear_infection:5,sinusitis:3}},
+      {t:"Drainage from the ear, or ear pain plus a fever",icon:"🌡️",next:"fever",s:{ear_infection:16,fever_general:2}}
+    ]
+  },
+  eye1:{
+    text:"Which description fits the eye?",
+    opts:[
+      {t:"Pink eye with sticky or crusty discharge",icon:"👁️",next:"fever",s:{conjunctivitis:16}},
+      {t:"Itchy, watery eyes along with sneezing or a runny nose",icon:"🌼",next:"fever",s:{allergic_rhinitis:14,conjunctivitis:3}},
+      {t:"The eye is painful, vision is worse, or light hurts",icon:"💡",next:"fever",s:{conjunctivitis:6}},
+      {t:"Gritty or dry, without much redness or goo",icon:"😐",next:"fever",s:{conjunctivitis:2,allergic_rhinitis:2}}
     ]
   },
   head2:{
@@ -339,7 +471,7 @@ const QUESTIONS = {
   head4:{
     text:"Which of these extra details fits best?",
     opts:[
-      {t:"Recent head injury, fall, or blow to the head",icon:"🪖",next:"fever",s:{concussion:14}},
+      {t:"Recent head injury, fall, or blow to the head",icon:"🪖",next:"fever",s:{concussion:30}},
       {t:"Facial pressure, nasal congestion, or pain when bending forward",icon:"👃",next:"fever",s:{sinusitis:10}},
       {t:"Very brief spinning spells when turning over or looking up",icon:"↪️",next:"fever",s:{vertigo:7}},
       {t:"None of these details clearly fits",icon:"❌",next:"fever",s:{tension_ha:2,migraine:2}}
@@ -353,22 +485,24 @@ const QUESTIONS = {
       {t:"Severe sore throat, pain on swallowing, with fever",icon:"🦠",next:"resp2",s:{strep:10,influenza:4,common_cold:2}},
       {t:"Cough — with or without mucus/phlegm",icon:"😮‍💨",next:"resp2",s:{bronchitis:8,common_cold:5,asthma:4,influenza:3,covid19:5,pneumonia:5}},
       {t:"Shortness of breath, chest tightness, or wheezing",icon:"😮",next:"resp2",s:{asthma:10,bronchitis:4,covid19:5,pneumonia:6}},
-      {t:"Itchy, watery eyes AND runny nose — especially seasonal",icon:"🌿",next:"resp2",s:{allergic_rhinitis:12,common_cold:2}}
+      {t:"Itchy, watery eyes AND runny nose — especially seasonal",icon:"🌿",next:"resp2",s:{allergic_rhinitis:12,common_cold:2}},
+      {t:"A sore spot on the chest when I press, twist, or breathe deeply",icon:"🦴",next:"resp2",s:{chest_wall:12,pneumonia:2,gerd:1}}
     ]
   },
   resp2:{
     text:"Do you have fever or significant body aches?",
     opts:[
       {t:"High fever (above 101°F / 38.5°C) AND severe body aches",icon:"🔥",next:"resp3",s:{influenza:10,covid19:7,strep:5,fever_general:5,pneumonia:4}},
-      {t:"Mild or low-grade fever",icon:"🌡️",next:"resp3",s:{common_cold:5,covid19:5,strep:4,bronchitis:3,pneumonia:2}},
+      {t:"Mild or low-grade fever",icon:"🌡️",next:"resp3",s:{common_cold:5,covid19:5,strep:4,bronchitis:3,pneumonia:2,sinusitis:3}},
       {t:"No fever, but feeling achy or run down",icon:"😟",next:"resp3",s:{common_cold:4,allergic_rhinitis:3}},
-      {t:"No fever and no body aches",icon:"👍",next:"resp3",s:{allergic_rhinitis:6,asthma:3,common_cold:2}}
+      {t:"No fever and no body aches",icon:"👍",next:"resp3",s:{asthma:3,common_cold:2}}
     ]
   },
   resp3:{
     text:"How did your symptoms begin?",
     opts:[
       {t:"Sudden onset — felt well, then became sick very quickly",icon:"⚡",next:"resp4",s:{influenza:8,strep:6,covid19:4,pneumonia:1}},
+      {t:"A twist, reach, or press on one spot started it, and I do not feel sick",icon:"🦴",next:"resp4",s:{chest_wall:8,muscle_strain:2}},
       {t:"Gradual onset over 1–2 days",icon:"📈",next:"resp4",s:{common_cold:8,bronchitis:5,covid19:5,pneumonia:4,sinusitis:4}},
       {t:"Recurring or seasonal pattern (predictable times of year)",icon:"🔄",next:"resp4",s:{allergic_rhinitis:12,asthma:6}},
       {t:"Chronic or on-and-off for weeks to months",icon:"↕️",next:"resp4",s:{asthma:8,allergic_rhinitis:5,sinusitis:5}}
@@ -377,10 +511,15 @@ const QUESTIONS = {
   resp4:{
     text:"What best describes your chest or upper-airway symptoms?",
     opts:[
-      {t:"Deep cough, chest pain with breathing, or shortness of breath at rest",icon:"🫁",next:"fever",s:{pneumonia:10,covid19:4,bronchitis:3}},
-      {t:"Facial pressure, thick nasal mucus, or bad breath after a cold",icon:"🤧",next:"fever",s:{sinusitis:10,common_cold:2}},
+      {t:"Deep cough, chest pain with breathing, or shortness of breath at rest",icon:"🫁",next:"fever",s:{pneumonia:14,covid19:4,bronchitis:2}},
+      {t:"Facial pressure, thick nasal mucus, or pain when bending forward",icon:"🤧",next:"fever",s:{sinusitis:20,common_cold:1}},
       {t:"Mostly wheezing or chest tightness from exercise, cold air, or allergens",icon:"🏃",next:"fever",s:{asthma:8}},
-      {t:"Mostly congestion, sneezing, or scratchy throat",icon:"🌬️",next:"fever",s:{common_cold:4,allergic_rhinitis:4}}
+      {t:"Mostly congestion, sneezing, or a scratchy throat",icon:"🌬️",next:"fever",s:{common_cold:4,allergic_rhinitis:4}},
+      {t:"Severe sore throat with fever, and I am not really coughing",icon:"🦠",next:"fever",s:{strep:12,influenza:1,common_cold:1}},
+      {t:"A lingering cough with mucus, and I can still breathe while resting",icon:"😮‍💨",next:"fever",s:{bronchitis:12,common_cold:2,pneumonia:1,covid19:2}},
+      {t:"I lost my sense of taste or smell",icon:"👃",next:"fever",s:{covid19:14,common_cold:1,sinusitis:2}},
+      {t:"A newer cough with fever, and breathing is okay while I rest",icon:"😷",next:"fever",s:{covid19:12,influenza:3,common_cold:2,pneumonia:1}},
+      {t:"One sore spot on the chest, and I am not coughing or wheezing",icon:"🦴",next:"fever",s:{chest_wall:14,pneumonia:1}}
     ]
   },
   // DIGESTIVE
@@ -392,7 +531,8 @@ const QUESTIONS = {
       {t:"Abdominal cramping and bloating",icon:"😣",next:"dig2",s:{ibs:10,gastroenteritis:4,gerd:2,constipation:7}},
       {t:"Severe abdominal pain — especially lower right",icon:"⚠️",next:"dig2",s:{appendicitis:12,peptic_ulcer:4,kidney_stones:3}},
       {t:"Stomach pain that wakes me at night or between meals",icon:"🌙",next:"dig2",s:{peptic_ulcer:12,gerd:5}},
-      {t:"Upper-right abdominal pain or nausea after rich/fatty meals",icon:"🍔",next:"dig2",s:{gallstones:12,gerd:3}}
+      {t:"Upper-right abdominal pain or nausea after rich/fatty meals",icon:"🍔",next:"dig2",s:{gallstones:12,gerd:3}},
+      {t:"Constipation — hard stools, straining, or going much less often",icon:"🧱",next:"dig2",s:{constipation:14,ibs:3}}
     ]
   },
   dig2:{
@@ -403,7 +543,8 @@ const QUESTIONS = {
       {t:"Symptoms are strongly triggered or worsened by stress",icon:"😰",next:"dig3",s:{ibs:10,gerd:3}},
       {t:"Sudden illness — possibly multiple people affected",icon:"👥",next:"dig3",s:{gastroenteritis:12}},
       {t:"Pain started near the navel then shifted to lower right",icon:"📍",next:"dig3",s:{appendicitis:15}},
-      {t:"Pain comes in waves after fatty meals or radiates to the right shoulder",icon:"🥓",next:"dig3",s:{gallstones:10}}
+      {t:"Pain comes in waves after fatty meals or radiates to the right shoulder",icon:"🥓",next:"dig3",s:{gallstones:10}},
+      {t:"Straining or hard stools is the main issue, not a sudden illness",icon:"🧱",next:"dig3",s:{constipation:8,ibs:2}}
     ]
   },
   dig3:{
@@ -440,7 +581,8 @@ const QUESTIONS = {
       {t:"Cloudy, dark, or foul-smelling urine",icon:"💛",next:"uri3",s:{uti:8}},
       {t:"Severe, wave-like pain in back or side (comes and goes)",icon:"🌊",next:"uri3",s:{kidney_stones:12,uti:2}},
       {t:"Fever with pain in the back or kidney area",icon:"🌡️",next:"uri3",s:{uti:6,kidney_stones:4,fever_general:5}},
-      {t:"Fatigue, blurred vision, slow-healing wounds",icon:"😴",next:"uri3",s:{diabetes:10,anemia:4}}
+      {t:"Fatigue, blurred vision, slow-healing wounds",icon:"😴",next:"uri3",s:{diabetes:10,anemia:4}},
+      {t:"None of those — the problem is sudden urges, not pain or fever",icon:"🚻",next:"uri3",s:{overactive_bladder:8,uti:1}}
     ]
   },
   uri3:{
@@ -507,9 +649,10 @@ const QUESTIONS = {
     opts:[
       {t:"Lower back",icon:"🔙",next:"msk3",s:{lower_back:8,muscle_strain:4}},
       {t:"Knee(s) or hip(s)",icon:"🦵",next:"msk3",s:{arthritis:8,muscle_strain:4,gout:3,tendonitis:3}},
-      {t:"Big toe, foot, or ankle",icon:"🦶",next:"msk3",s:{gout:10,arthritis:4}},
+      {t:"Big toe, and even a light touch hurts",icon:"🦶",next:"msk3",s:{gout:12,arthritis:2}},
       {t:"Shoulder, neck, or upper back",icon:"🤷",next:"msk3",s:{muscle_strain:8,tension_ha:4,tendonitis:4}},
-      {t:"Hands, wrists, or fingers",icon:"🤲",next:"msk3",s:{arthritis:8,gout:3,tendonitis:6}}
+      {t:"Hands, wrists, or fingers",icon:"🤲",next:"msk3",s:{arthritis:8,gout:3,tendonitis:6}},
+      {t:"Ankle, calf, or a muscle I twisted or overloaded",icon:"🦶",next:"msk3",s:{muscle_strain:10,tendonitis:3}}
     ]
   },
   msk3:{
@@ -527,7 +670,8 @@ const QUESTIONS = {
       {t:"Localized near a joint and worsens with repeated use or one specific motion",icon:"🎾",next:"fever",s:{tendonitis:16,muscle_strain:3}},
       {t:"Joint feels stiff, achy, or crunchy over time",icon:"🦴",next:"fever",s:{arthritis:8}},
       {t:"Pain shoots from the back into the buttock or leg",icon:"⚡",next:"fever",s:{lower_back:8}},
-      {t:"Joint is hot, swollen, and extremely tender to light touch",icon:"🔥",next:"fever",s:{gout:8}}
+      {t:"Joint is hot, swollen, and extremely tender to light touch",icon:"🔥",next:"fever",s:{gout:8}},
+      {t:"One movement caused a pull, strain, or sharp muscle pain",icon:"💪",next:"fever",s:{muscle_strain:14,tendonitis:2,lower_back:2}}
     ]
   },
   // MENTAL HEALTH
@@ -564,7 +708,7 @@ const QUESTIONS = {
       {t:"Loud snoring, waking up gasping, or someone notices pauses in breathing",icon:"😮‍💨",next:"fever",s:{sleep_apnea:8,insomnia:2}},
       {t:"Symptoms clearly followed a major stressor or life change",icon:"🌧️",next:"fever",s:{anxiety:4,depression:4}},
       {t:"Fear surges in waves and then settles back down",icon:"🌊",next:"fever",s:{panic_disorder:7}},
-      {t:"My mind stays busy at night, but breathing or snoring is not the issue",icon:"🧠",next:"fever",s:{insomnia:8,anxiety:4}}
+      {t:"My mind stays busy at night, but breathing or snoring is not the issue",icon:"🧠",next:"fever",s:{insomnia:14,anxiety:2}}
     ]
   },
   // GENERAL
@@ -593,15 +737,16 @@ const QUESTIONS = {
       {t:"Dry mouth, dark urine, dizziness, or recent heat/exercise/illness",icon:"🥤",next:"fever",s:{dehydration:10}},
       {t:"Weight gain, cold intolerance, dry skin, and constipation over time",icon:"🧣",next:"fever",s:{hypothyroidism:10}},
       {t:"Loud snoring, unrestorative sleep, or daytime dozing",icon:"😴",next:"fever",s:{sleep_apnea:10}},
-      {t:"Infectious symptoms or fever are clearly the main issue",icon:"🦠",next:"fever",s:{fever_general:6,influenza:4,covid19:3}}
+      {t:"Infectious symptoms or fever are clearly the main issue",icon:"🦠",next:"fever",s:{fever_general:10,influenza:4,covid19:3}},
+      {t:"None of those — fatigue, paleness, or feeling run down is the main issue",icon:"😮‍💨",next:"fever",s:{anemia:8}}
     ]
   },
   // SHARED
   fever:{
     text:"Do you currently have a fever?",
     opts:[
-      {t:"Yes — high fever (above 102°F / 39°C)",icon:"🔥",next:"dur",s:{influenza:6,fever_general:8,covid19:5,strep:5}},
-      {t:"Yes — mild or low-grade fever",icon:"🌡️",next:"dur",s:{common_cold:4,covid19:4,fever_general:4,uti:3}},
+      {t:"Yes — high fever (above 102°F / 39°C)",icon:"🔥",next:"dur",s:{influenza:6,fever_general:8,covid19:5,strep:5,pneumonia:5,ear_infection:3}},
+      {t:"Yes — mild or low-grade fever",icon:"🌡️",next:"dur",s:{common_cold:4,covid19:4,fever_general:4,uti:3,sinusitis:3,bronchitis:2,ear_infection:3,strep:2}},
       {t:"No fever",icon:"👍",next:"dur",s:{tension_ha:2,allergic_rhinitis:3,ibs:2,anxiety:2}},
       {t:"I haven't checked / not sure",icon:"❓",next:"dur",s:{}}
     ]
@@ -610,8 +755,8 @@ const QUESTIONS = {
     text:"How long have you been experiencing these symptoms?",
     opts:[
       {t:"Less than 24 hours",icon:"⏰",next:"sev",s:{appendicitis:4,kidney_stones:3,gastroenteritis:4,gout:4}},
-      {t:"1–3 days",icon:"📅",next:"sev",s:{influenza:4,common_cold:4,strep:4,covid19:4}},
-      {t:"4–14 days",icon:"🗓️",next:"sev",s:{common_cold:3,bronchitis:5,covid19:3}},
+      {t:"1–3 days",icon:"📅",next:"sev",s:{influenza:4,common_cold:4,strep:4,covid19:4,pneumonia:3,ear_infection:3}},
+      {t:"4–14 days",icon:"🗓️",next:"sev",s:{common_cold:3,bronchitis:5,covid19:3,sinusitis:5,pneumonia:4}},
       {t:"More than 2 weeks",icon:"📆",next:"sev",s:{ibs:4,gerd:4,arthritis:4,anxiety:4,depression:4,lower_back:4}},
       {t:"Months to years — chronic condition",icon:"♾️",next:"sev",s:{ibs:7,gerd:6,arthritis:6,anxiety:5,depression:5,hypertension:4}}
     ]
@@ -645,7 +790,11 @@ let pendingOpt = null;
 let pendingOpts = [];
 
 function resetState(){
-  state = {screen:'quiz',history:[],scores:{},sectionQueue:[],sharedNext:null};
+  state.screen = 'quiz';
+  state.history.length = 0;
+  for(const key of Object.keys(state.scores)) delete state.scores[key];
+  state.sectionQueue.length = 0;
+  state.sharedNext = null;
   pendingOpt = null;
   pendingOpts = [];
 }
@@ -674,12 +823,13 @@ function updateStatusPill(){
   const label = document.querySelector('.status-text');
   if(!label) return;
   if(state.screen==='emergency'){
-    label.textContent='Emergency — seek care';
+    label.textContent='Get care now';
   }else if(state.screen==='results'){
-    label.textContent='Assessment complete';
+    label.textContent='Notes ready';
+  }else if(state.history.length===0){
+    label.textContent='Just opened';
   }else{
-    const step = state.history.length+1;
-    label.textContent=`Step ${step}`;
+    label.textContent='Question '+(state.history.length+1);
   }
 }
 
@@ -771,22 +921,22 @@ function renderClinicalSidebar(pct,caption,showOnMobile){
       </div>
       <div class="match-track"><div class="match-fill" style="width:${matchPct}%"></div></div>
     </div>`;
-  }).join('') : `<div class="match-empty">Matches will appear as you answer questions.</div>`;
+  }).join('') : `<div class="match-empty">Nothing to line up yet. Answer a couple of questions and the nearer conditions show up here.</div>`;
   const path = state.history.map(renderHistoryLabel).join('');
   const mobileClass = showOnMobile ? ' show-mobile' : '';
 
   return `
   <aside class="clinical-sidebar${mobileClass}">
     <section class="sidebar-block">
-      <div class="side-label">Progress</div>
+      <div class="side-label">Where you are</div>
       <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
       <p class="progress-caption">${escapeHtml(caption)}</p>
     </section>
     <section class="sidebar-block">
-      <div class="side-label">Leading matches</div>
+      <div class="side-label">Closer fits</div>
       <div class="match-list">${matchCards}</div>
     </section>
-    ${path ? `<section class="sidebar-block"><div class="side-label">Your responses</div><div class="path-list">${path}</div></section>` : ''}
+    ${path ? `<section class="sidebar-block"><div class="side-label">What you said</div><div class="path-list">${path}</div></section>` : ''}
   </aside>`;
 }
 
@@ -806,12 +956,17 @@ function renderQuiz(){
   const pct = Math.min(Math.round((state.history.length/totalQuestions)*100),95);
   const multi = isMultiSelectQuestion(qid);
   const selectedCount = getSelectedIndexes(qid).length;
+  const caption = state.history.length===0 ? 'This is the opening question.' : `About ${pct}% of the way through.`;
+  const nextLabel = continueLabel(qid, selectedCount);
 
   const main = `
   <main class="console">
     <div class="console-head">
-      <div class="kicker">Question ${stepNum} of ${totalQuestions}</div>
-      <div class="console-title">${escapeHtml(q.text)}</div>
+      <div class="kicker-row">
+        <span class="kicker">Question ${stepNum}</span>
+        <span class="kicker-of">of about ${totalQuestions}</span>
+      </div>
+      <h2 class="console-title">${escapeHtml(q.text)}</h2>
       ${q.sub?`<p class="console-copy">${escapeHtml(q.sub)}</p>`:''}
       <div class="progress-chip">
         <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
@@ -822,24 +977,32 @@ function renderQuiz(){
         const selected = multi ? pendingOpts.includes(i) : pendingOpt===i;
         return `
         <button class="opt${selected?' selected':''}" aria-pressed="${selected?'true':'false'}" onclick="selectOpt(${i})" id="opt${i}" data-idx="${i}">
-          <span class="opt-marker" aria-hidden="true"></span>
+          <span class="opt-marker" aria-hidden="true">${i+1}</span>
           <span><strong>${escapeHtml(o.t)}</strong>${o.sub?`<small>${escapeHtml(o.sub)}</small>`:''}</span>
         </button>`;
       }).join('')}
     </div>
     <div class="composer">
+      <p class="key-hint">Keys 1–9 choose an answer. Enter continues.</p>
       <div class="composer-actions nav">
         <div class="action-left">
           <button class="btn-back" onclick="goBack()" ${state.history.length===0?'disabled':''}>Back</button>
           <button class="btn-secondary" onclick="restart()">Start over</button>
         </div>
         <div class="action-right">
-          <button class="btn-next" id="btn-next" ${selectedCount===0?'disabled':''} onclick="advance()">Continue</button>
+          <button class="btn-next" id="btn-next" ${selectedCount===0?'disabled':''} onclick="advance()">${nextLabel}</button>
         </div>
       </div>
     </div>
   </main>`;
-  return renderAppShell(main,pct,`Step ${stepNum} of ${totalQuestions}`,false);
+  return renderAppShell(main,pct,caption,false);
+}
+
+function continueLabel(qid, count){
+  if(!isMultiSelectQuestion(qid)) return 'Continue';
+  if(count===0) return 'Continue';
+  if(count===1) return 'Continue with 1 area';
+  return `Continue with ${count} areas`;
 }
 
 function selectOpt(i){
@@ -856,7 +1019,11 @@ function selectOpt(i){
     el.setAttribute('aria-pressed',selected ? 'true' : 'false');
   });
   const nb = document.getElementById('btn-next');
-  if(nb) nb.disabled = getSelectedIndexes(qid).length === 0;
+  if(nb){
+    const count = getSelectedIndexes(qid).length;
+    nb.disabled = count === 0;
+    nb.textContent = continueLabel(qid, count);
+  }
 }
 
 function scrollToQuestion(){
@@ -875,7 +1042,12 @@ function advance(){
 
   const beforeQueue = [...state.sectionQueue];
   const beforeSharedNext = state.sharedNext;
-  const scores = mergeScoresForIndexes(q,selected);
+  const rawScores = mergeScoresForIndexes(q,selected);
+  const scores = {};
+  for(const [k,v] of Object.entries(rawScores)){
+    if(SHARED_FLOW.has(qid) && !(state.scores[k] > 0)) continue;
+    scores[k] = v;
+  }
   addScores(scores);
 
   let naturalNext = q.opts[selected[0]]?.next || 'RESULTS';
@@ -942,13 +1114,13 @@ function renderEmergency(){
   <div class="workspace">
     <main class="console">
       <div class="emergency-screen">
-        <h2>Seek emergency medical care</h2>
-        <p>You indicated symptoms that may require immediate attention. Call <strong>911</strong> or go to the nearest emergency department. Do not use this tool in place of emergency care.</p>
+        <h2>This needs a person, not a form.</h2>
+        <p>You marked a warning sign. Call <strong>911</strong> or go to the nearest emergency department. Do not wait on this interview.</p>
         <div class="emergency-actions">
           <button class="btn-primary" onclick="window.open('tel:911','_self')">Call 911</button>
-          <button class="btn-secondary" onclick="restart()">Start over</button>
-          <button class="btn-link" onclick="continueAnyway()">Continue assessment anyway</button>
+          <button class="btn-secondary" onclick="restart()">Back to the start</button>
         </div>
+        <button class="btn-link emergency-continue" onclick="continueAnyway()">Continue the interview anyway</button>
       </div>
     </main>
   </div>`;
@@ -984,26 +1156,26 @@ function renderResultsContent(){
 
   if(ranked.length===0){
     return `<div class="analysis-summary">
-      <h3>No Clear Match</h3>
-      <p style="color:var(--muted);line-height:1.55">Based on your answers, we couldn't identify a likely condition. Please consult a healthcare provider for proper evaluation.</p>
-      <button class="btn-restart" onclick="restart()" style="margin-top:1rem">Start Over</button>
+      <h3>No clear overlap</h3>
+      <p>Nothing in the list lined up with what you described. A clinician can sort that out. This page cannot.</p>
+      <button class="btn-restart" onclick="restart()">Start another interview</button>
     </div>`;
   }
 
   const maxScore = ranked[0][1];
   const hasEmergency = ranked.some(([k])=>CONDITIONS[k]&&CONDITIONS[k].urgency==='high');
   const summary = getAnalysisSummary();
-  const ranks = ['Most Likely','Also Possible','Also Consider'];
+  const ranks = ['Closest fit','Next','Also in the mix'];
   const rankClasses = ['r1','r2','r3'];
 
   let html = `
   <div class="analysis-summary">
-    <h3>Assessment complete</h3>
-    <p>${state.history.length} responses analyzed across ${summary.matchCount} condition indicators. Scores reflect relative likelihood for educational purposes only.</p>
+    <h3>How to read this</h3>
+    <p>You answered ${state.history.length} questions. ${summary.matchCount} conditions picked up some overlap. The bars compare those conditions with each other. They are not a probability and not a diagnosis.</p>
   </div>`;
 
   if(hasEmergency){
-    html += `<div class="emergency-banner">One or more possible conditions below may require emergency medical attention. Please seek care immediately if symptoms are severe.</div>`;
+    html += `<div class="emergency-banner">One of these can be an emergency. If the symptoms are severe, get care now instead of reading on.</div>`;
   }
 
   ranked.forEach(([cid, score], idx)=>{
@@ -1012,8 +1184,8 @@ function renderResultsContent(){
     const pct = Math.round((score/maxScore)*100);
     const barClass = pct>=70?'mhigh':pct>=40?'mmed':'mlow';
     const urgClass = c.urgency==='high'?'u-high':c.urgency==='mod'?'u-mod':'u-low';
-    const urgLabel = c.urgency==='high'?'Seek Medical Care Soon':c.urgency==='mod'?'See a Doctor':'Generally Not Urgent';
-    const confidence = pct>=75?'Higher likelihood':pct>=45?'Moderate likelihood':'Lower likelihood';
+    const urgLabel = c.urgency==='high'?'Get care soon':c.urgency==='mod'?'See a doctor':'Usually not urgent';
+    const confidence = pct>=75?'Strongest overlap here':pct>=45?'Partial overlap':'Weaker overlap';
 
     html += `
     <div class="res-card ${idx===0?'top':''}">
@@ -1022,9 +1194,9 @@ function renderResultsContent(){
           <div class="res-cat">${escapeHtml(c.cat)}</div>
           <div class="res-name">${escapeHtml(c.name)}</div>
         </div>
-        <div style="text-align:right">
+        <div class="res-score">
           <div class="rank-pill ${rankClasses[idx]}">${ranks[idx]}</div>
-          <div class="match-pct" style="margin-top:.25rem">${pct}% relative likelihood</div>
+          <div class="match-pct">${pct}%</div>
           <div class="match-confidence">${confidence}</div>
         </div>
       </div>
@@ -1033,7 +1205,7 @@ function renderResultsContent(){
 
       <div class="sec-label" onclick="toggleSection('sym${idx}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleSection('sym${idx}')}" tabindex="0" role="button" aria-expanded="false" id="lbl-sym${idx}">
         <svg width="8" height="12" viewBox="0 0 8 12"><path d="M1 1l6 5-6 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
-        Common Symptoms (${c.symptoms.length})
+        Common symptoms, ${c.symptoms.length}
       </div>
       <div class="list-panel" id="sym${idx}">
         <div class="list">${c.symptoms.map(s=>`<div class="list-item sym">${escapeHtml(s)}</div>`).join('')}</div>
@@ -1041,7 +1213,7 @@ function renderResultsContent(){
 
       <div class="sec-label" onclick="toggleSection('trt${idx}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleSection('trt${idx}')}" tabindex="0" role="button" aria-expanded="false" id="lbl-trt${idx}">
         <svg width="8" height="12" viewBox="0 0 8 12"><path d="M1 1l6 5-6 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
-        Care Options (${c.treatments.length})
+        Care options, ${c.treatments.length}
       </div>
       <div class="list-panel" id="trt${idx}">
         <div class="list">${c.treatments.map(t=>`<div class="list-item trt">${escapeHtml(t)}</div>`).join('')}</div>
@@ -1056,9 +1228,9 @@ function renderResultsContent(){
 
   html += `
   <div class="res-disclaimer">
-    <strong>Disclaimer:</strong> This symptom checker is for general educational information only. It is <strong>not a substitute for professional medical advice, diagnosis, or treatment</strong>. Always consult a qualified healthcare professional. If you believe you are experiencing a medical emergency, <strong>call 911 immediately</strong>.
+    <strong>Still not a diagnosis.</strong> Qurest is educational. It does not replace a clinician. If you think this is an emergency, <strong>call 911</strong>.
   </div>
-  <button class="btn-restart" onclick="restart()">Check Different Symptoms</button>`;
+  <button class="btn-restart" onclick="restart()">Start another interview</button>`;
 
   return html;
 }
@@ -1067,13 +1239,13 @@ function renderResults(){
   const main = `
   <main class="console">
     <div class="console-head">
-      <div class="kicker">Results</div>
-      <div class="console-title">Assessment summary</div>
-      <p class="console-copy">Educational analysis based on your responses. Not a medical diagnosis.</p>
+      <div class="kicker-row"><span class="kicker">Your notes</span></div>
+      <h2 class="console-title">The closer fits</h2>
+      <p class="console-copy">From this interview only. Take them to a person who can actually examine you.</p>
     </div>
     <div class="results-main">${renderResultsContent()}</div>
   </main>`;
-  return renderAppShell(main, 100, 'Complete', true);
+  return renderAppShell(main, 100, "That's the end of the interview.", true);
 }
 
 function toggleSection(id){
@@ -1130,21 +1302,37 @@ function isMobileLayout(){
 }
 
 function pinMobileFooter(){
-  const existing = document.getElementById('mobile-footer');
-  if(existing) existing.remove();
+  const inApp = document.querySelector('#app .composer');
+  const parked = document.getElementById('mobile-footer');
+  const keepFooter = isMobileLayout() && state.screen === 'quiz';
 
-  if(!isMobileLayout() || state.screen !== 'quiz') return;
+  if(!keepFooter){
+    if(parked && inApp && parked !== inApp) parked.remove();
+    if(parked && !inApp){
+      const host = document.querySelector('#app .console');
+      if(host && state.screen === 'quiz'){
+        parked.removeAttribute('id');
+        parked.removeAttribute('role');
+        parked.removeAttribute('aria-label');
+        host.appendChild(parked);
+      }else{
+        parked.remove();
+      }
+    }
+    return;
+  }
 
-  const composer = document.querySelector('.composer');
+  const composer = inApp || parked;
   if(!composer) return;
-
+  if(parked && inApp && parked !== inApp) parked.remove();
   composer.id = 'mobile-footer';
   composer.setAttribute('role','navigation');
   composer.setAttribute('aria-label','Assessment navigation');
-  document.body.appendChild(composer);
+  if(composer.parentElement !== document.body) document.body.appendChild(composer);
 }
 
 function render(){
+  document.body.dataset.screen = state.screen;
   const app = document.getElementById('app');
   if(state.screen==='emergency') app.innerHTML = renderEmergency();
   else if(state.screen==='quiz') app.innerHTML = renderQuiz();
