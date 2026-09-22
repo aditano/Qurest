@@ -315,7 +315,7 @@ const cases = [
     ['fever', 'No fever'], ['dur', 'Months to years'], ['sev', 'Mild']
   ]],
   ['a tender spot on the chest', 'chest_wall', 1, ['Chest or respiratory'], [
-    ['resp1', 'sore spot on the chest'], ['resp2', 'No fever and no body aches'], ['resp3', 'Sudden onset'], ['resp4', 'not coughing or wheezing'],
+    ['resp1', 'sore spot on the chest'], ['resp2', 'No fever and no body aches'], ['resp3', 'do not feel sick'], ['resp4', 'not coughing or wheezing'],
     ['fever', 'No fever'], ['dur', '1–3 days'], ['sev', 'Moderate']
   ]],
   ['cough plus a stomach bug', 'gastroenteritis', 3, ['Chest or respiratory', 'Stomach or digestive'], [

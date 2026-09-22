@@ -495,13 +495,14 @@ const QUESTIONS = {
       {t:"High fever (above 101°F / 38.5°C) AND severe body aches",icon:"🔥",next:"resp3",s:{influenza:10,covid19:7,strep:5,fever_general:5,pneumonia:4}},
       {t:"Mild or low-grade fever",icon:"🌡️",next:"resp3",s:{common_cold:5,covid19:5,strep:4,bronchitis:3,pneumonia:2,sinusitis:3}},
       {t:"No fever, but feeling achy or run down",icon:"😟",next:"resp3",s:{common_cold:4,allergic_rhinitis:3}},
-      {t:"No fever and no body aches",icon:"👍",next:"resp3",s:{allergic_rhinitis:6,asthma:3,common_cold:2}}
+      {t:"No fever and no body aches",icon:"👍",next:"resp3",s:{asthma:3,common_cold:2}}
     ]
   },
   resp3:{
     text:"How did your symptoms begin?",
     opts:[
       {t:"Sudden onset — felt well, then became sick very quickly",icon:"⚡",next:"resp4",s:{influenza:8,strep:6,covid19:4,pneumonia:1}},
+      {t:"A twist, reach, or press on one spot started it, and I do not feel sick",icon:"🦴",next:"resp4",s:{chest_wall:8,muscle_strain:2}},
       {t:"Gradual onset over 1–2 days",icon:"📈",next:"resp4",s:{common_cold:8,bronchitis:5,covid19:5,pneumonia:4,sinusitis:4}},
       {t:"Recurring or seasonal pattern (predictable times of year)",icon:"🔄",next:"resp4",s:{allergic_rhinitis:12,asthma:6}},
       {t:"Chronic or on-and-off for weeks to months",icon:"↕️",next:"resp4",s:{asthma:8,allergic_rhinitis:5,sinusitis:5}}
