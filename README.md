@@ -5,8 +5,8 @@ Qurest is a browser-based symptom checker prototype laid out like a printed clin
 ## What The Software Does
 
 - Starts with multi-select symptom areas, so mixed presentations such as cough plus stomach symptoms can be checked together.
-- Asks follow-up questions across multiple symptom areas, including head and neurological symptoms, respiratory issues, digestive complaints, urinary problems, skin concerns, musculoskeletal pain, mental health concerns, and general/systemic symptoms.
-- Scores answers against a library of 40+ common conditions.
+- Asks follow-up questions across multiple symptom areas, including head, ear, and eye symptoms, respiratory and chest-wall pain, digestive complaints, urinary problems, skin concerns, musculoskeletal pain, mental health concerns, and general/systemic symptoms.
+- Scores answers against a library of common conditions. Later questions only adjust conditions the interview has already picked up, so a rash does not turn into an unrelated diagnosis.
 - Shows the top 3 likely matches with symptom summaries, care guidance, and urgency notes.
 - Highlights potentially higher-risk results and reminds users that urgent medical care may be needed in emergency scenarios.
 
@@ -22,10 +22,9 @@ Qurest is a browser-based symptom checker prototype laid out like a printed clin
 
 The current prototype includes:
 
-- 44 condition profiles
-- 35 question nodes in the decision tree (including emergency red-flag screening)
+- 47 condition profiles, including everyday problems such as ear infection, pink eye, and chest-wall pain
+- 37 question nodes in the decision tree (including emergency red-flag screening)
 - Multi-select first step with numbered answers
-- Interactive body-region map that highlights affected areas during intake
 - Live match preview with relative likelihood scoring
 - Results cards with common symptoms, care options, and urgency messaging
 - Educational-only medical disclaimers throughout the experience
@@ -49,6 +48,12 @@ python3 -m http.server
 
 You can also open `index.html` directly.
 
+A node script checks that ordinary descriptions of common problems still surface in the top three matches:
+
+```bash
+node scripts/check-common-cases.mjs
+```
+
 ## GitHub Pages
 
 This repo is ready to publish from the root of the `main` branch. Once GitHub Pages is enabled, the app will be available at:
@@ -61,4 +66,5 @@ https://aditano.github.io/Qurest/
 
 - `index.html` - the full prototype UI, question tree, condition data, scoring logic, and results rendering
 - `symptom-checker.html` - compatibility redirect to the Pages-friendly root path
+- `scripts/check-common-cases.mjs` - checks that ordinary descriptions of common problems still surface in the results
 - `README.md` - project overview and usage notes
