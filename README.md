@@ -1,6 +1,6 @@
 # Qurest
 
-Qurest is a browser-based symptom checker prototype with a dark, chip-driven intake UI. It uses a deterministic question tree so the app stays fast, predictable, and easy to run as a static page.
+Qurest is a browser-based symptom checker prototype laid out like a printed clinic form: a numbered interview with margin notes. It uses a deterministic question tree so the app stays fast, predictable, and easy to run as a static page.
 
 ## What The Software Does
 
@@ -24,7 +24,7 @@ The current prototype includes:
 
 - 44 condition profiles
 - 35 question nodes in the decision tree (including emergency red-flag screening)
-- Multi-select first step with deterministic chip navigation
+- Multi-select first step with numbered answers
 - Interactive body-region map that highlights affected areas during intake
 - Live match preview with relative likelihood scoring
 - Results cards with common symptoms, care options, and urgency messaging
