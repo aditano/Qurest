@@ -249,6 +249,17 @@
       max-width:1080px;margin:0 auto;padding:.85rem 1.4rem 2rem;
       color:var(--ink-soft);font-size:.88rem;border-top:1px solid var(--rule-strong);
     }
+    @media(min-width:701px){
+      body[data-screen="quiz"] .console{
+        display:flex;flex-direction:column;max-height:calc(100dvh - 16.2rem);
+      }
+      body[data-screen="quiz"] .choice-grid{
+        overflow-y:auto;min-height:0;
+        scrollbar-width:thin;scrollbar-color:var(--teal-deep) #d5e3db;
+      }
+      body[data-screen="quiz"] .console-head,
+      body[data-screen="quiz"] .composer{flex-shrink:0}
+    }
     @media(max-width:900px){
       .workspace{grid-template-columns:1fr}
       .clinical-sidebar{display:none}
@@ -262,21 +273,20 @@
     }
     @media(max-width:700px){
       .stamp{transform:none}
-      .masthead{align-items:flex-start;flex-direction:column;gap:.8rem;padding:1rem 1rem .85rem}
+      .masthead{align-items:flex-start;gap:.75rem;padding:.8rem .9rem .65rem}
+      h1{font-size:2.15rem}
     }
     @media(max-width:640px){
       :root{--spine:10px}
       .container{padding:1rem .9rem 1.4rem}
-      .masthead{padding:.9rem .85rem .75rem}
-      h1{font-size:2.45rem}
-      .preface{font-size:.92rem;margin-bottom:1rem}
-      .console-head{padding:1rem .9rem .85rem}
-      .console-title{font-size:1.38rem}
-      .choice-grid{
-        flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
-        padding:.15rem .7rem .5rem;
-        max-height:calc(100dvh - 22rem - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));
-      }
+      .masthead{padding:.75rem .8rem .6rem}
+      .masthead-sub{font-size:.95rem;margin-top:.25rem}
+      .preface{font-size:.92rem;margin-bottom:.85rem}
+      .console-head{padding:.85rem .9rem .55rem}
+      .console-title{font-size:1.32rem}
+      .kicker-row{margin-bottom:.4rem}
+      .choice-grid{padding:0 .55rem .25rem}
+      .opt{padding:.62rem .15rem}
       .console .composer{display:none}
       #mobile-footer{
         display:block;position:fixed;left:var(--spine);right:0;bottom:0;z-index:50;
@@ -284,9 +294,9 @@
         padding:.7rem .85rem calc(.75rem + env(safe-area-inset-bottom,0px));
       }
       #mobile-footer .key-hint{display:none}
-      #mobile-footer .composer-actions{flex-direction:column-reverse;align-items:stretch;gap:.55rem}
-      #mobile-footer .action-left{width:100%;display:flex;justify-content:space-between;gap:.75rem}
-      #mobile-footer .action-right{width:100%}
+      #mobile-footer .composer-actions{flex-direction:row;align-items:center;gap:.7rem}
+      #mobile-footer .action-left{width:auto;display:flex;gap:.75rem;flex-shrink:0}
+      #mobile-footer .action-right{flex:1}
       #mobile-footer .btn-next{width:100%;min-height:48px}
       #mobile-footer .btn-back,#mobile-footer .btn-secondary{min-height:44px}
       .results-main{padding:0 .9rem 1rem}
@@ -297,6 +307,7 @@
       .res-card-header{flex-direction:column;gap:.45rem}
       .res-score{text-align:left}
       .res-name{font-size:1.35rem}
+      body:has(#mobile-footer) .container{padding-bottom:6.5rem}
       body:has(#mobile-footer) .colophon{margin-bottom:5.5rem}
       .colophon{padding-left:.9rem;padding-right:.9rem}
     }
@@ -321,7 +332,7 @@
 </header>
 
 <div class="container">
-  <p class="preface"><span>Note.</span> Your answers stay in this browser. Qurest lines them up against common conditions and shows the closer fits. It cannot tell you what you have. If this might be an emergency, call 911.</p>
+  <p class="preface"><span>Note.</span> Your answers stay in this browser. Qurest cannot diagnose you. If this might be an emergency, call 911.</p>
   <div id="app"></div>
 </div>
 <footer class="colophon">Printed-form interview · nothing is saved or sent · call 911 for a real emergency</footer>
@@ -1140,7 +1151,7 @@ function renderResultsContent(){
         </div>
         <div class="res-score">
           <div class="rank-pill ${rankClasses[idx]}">${ranks[idx]}</div>
-          <div class="match-pct">${pct}</div>
+          <div class="match-pct">${pct}%</div>
           <div class="match-confidence">${confidence}</div>
         </div>
       </div>
@@ -1246,18 +1257,33 @@ function isMobileLayout(){
 }
 
 function pinMobileFooter(){
-  const existing = document.getElementById('mobile-footer');
-  if(existing) existing.remove();
+  const inApp = document.querySelector('#app .composer');
+  const parked = document.getElementById('mobile-footer');
+  const keepFooter = isMobileLayout() && state.screen === 'quiz';
 
-  if(!isMobileLayout() || state.screen !== 'quiz') return;
+  if(!keepFooter){
+    if(parked && inApp && parked !== inApp) parked.remove();
+    if(parked && !inApp){
+      const host = document.querySelector('#app .console');
+      if(host && state.screen === 'quiz'){
+        parked.removeAttribute('id');
+        parked.removeAttribute('role');
+        parked.removeAttribute('aria-label');
+        host.appendChild(parked);
+      }else{
+        parked.remove();
+      }
+    }
+    return;
+  }
 
-  const composer = document.querySelector('.composer');
+  const composer = inApp || parked;
   if(!composer) return;
-
+  if(parked && inApp && parked !== inApp) parked.remove();
   composer.id = 'mobile-footer';
   composer.setAttribute('role','navigation');
   composer.setAttribute('aria-label','Assessment navigation');
-  document.body.appendChild(composer);
+  if(composer.parentElement !== document.body) document.body.appendChild(composer);
 }
 
 function render(){
