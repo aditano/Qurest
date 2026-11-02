@@ -319,7 +319,7 @@
 </head>
 <body>
 
-<a class="skip" href="#app">Skip to the question</a>
+<a class="skip" href="#app">Skip to main content</a>
 <div class="spine" aria-hidden="true"></div>
 
 <header class="masthead">
@@ -333,7 +333,7 @@
 
 <div class="container">
   <p class="preface"><span>Note.</span> Your answers stay in this browser. Qurest cannot diagnose you. If this might be an emergency, call 911.</p>
-  <div id="app"></div>
+  <div id="app" tabindex="-1"></div>
 </div>
 <footer class="colophon">Printed-form interview · nothing is saved or sent · call 911 for a real emergency</footer>
 
@@ -984,8 +984,8 @@ function renderClinicalSidebar(pct,caption,showOnMobile){
   return `
   <aside class="clinical-sidebar${mobileClass}">
     <section class="sidebar-block">
-      <div class="side-label">Where you are</div>
-      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <div class="side-label" id="side-progress-label">Where you are</div>
+      <div class="progress-bar" role="progressbar" aria-labelledby="side-progress-label" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}"><div class="progress-fill" style="width:${pct}%"></div></div>
       <p class="progress-caption">${escapeHtml(caption)}</p>
     </section>
     <section class="sidebar-block">
@@ -1025,7 +1025,7 @@ function renderQuiz(){
       <h2 class="console-title">${escapeHtml(q.text)}</h2>
       ${q.sub?`<p class="console-copy">${escapeHtml(q.sub)}</p>`:''}
       <div class="progress-chip">
-        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <div class="progress-bar" role="progressbar" aria-label="Interview progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}"><div class="progress-fill" style="width:${pct}%"></div></div>
       </div>
     </div>
     <div class="choice-grid" id="opts">
@@ -1182,7 +1182,7 @@ function renderEmergency(){
   return `
   <div class="workspace">
     <main class="console">
-      <div class="emergency-screen">
+      <div class="emergency-screen" role="alert">
         <h2>This needs a person, not a form.</h2>
         <p>You marked a warning sign. Call <strong>911</strong> or go to the nearest emergency department. Do not wait on this interview.</p>
         <div class="emergency-actions">
@@ -1281,19 +1281,19 @@ function renderResultsContent(){
       <div class="match-bar-wrap"><div class="match-bar-fill ${barClass}" style="width:${pct}%"></div></div>
       <div class="res-desc">${escapeHtml(c.desc)}</div>
 
-      <div class="sec-label" onclick="toggleSection('sym${idx}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleSection('sym${idx}')}" tabindex="0" role="button" aria-expanded="false" id="lbl-sym${idx}">
-        <svg width="8" height="12" viewBox="0 0 8 12"><path d="M1 1l6 5-6 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      <div class="sec-label" onclick="toggleSection('sym${idx}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleSection('sym${idx}')}" tabindex="0" role="button" aria-expanded="false" aria-controls="sym${idx}" id="lbl-sym${idx}">
+        <svg width="8" height="12" viewBox="0 0 8 12" aria-hidden="true"><path d="M1 1l6 5-6 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
         Common symptoms, ${c.symptoms.length}
       </div>
-      <div class="list-panel" id="sym${idx}">
+      <div class="list-panel" id="sym${idx}" role="region" aria-labelledby="lbl-sym${idx}">
         <div class="list">${c.symptoms.map(s=>`<div class="list-item sym">${escapeHtml(s)}</div>`).join('')}</div>
       </div>
 
-      <div class="sec-label" onclick="toggleSection('trt${idx}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleSection('trt${idx}')}" tabindex="0" role="button" aria-expanded="false" id="lbl-trt${idx}">
-        <svg width="8" height="12" viewBox="0 0 8 12"><path d="M1 1l6 5-6 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      <div class="sec-label" onclick="toggleSection('trt${idx}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleSection('trt${idx}')}" tabindex="0" role="button" aria-expanded="false" aria-controls="trt${idx}" id="lbl-trt${idx}">
+        <svg width="8" height="12" viewBox="0 0 8 12" aria-hidden="true"><path d="M1 1l6 5-6 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
         Care options, ${c.treatments.length}
       </div>
-      <div class="list-panel" id="trt${idx}">
+      <div class="list-panel" id="trt${idx}" role="region" aria-labelledby="lbl-trt${idx}">
         <div class="list">${c.treatments.map(t=>`<div class="list-item trt">${escapeHtml(t)}</div>`).join('')}</div>
       </div>
 
