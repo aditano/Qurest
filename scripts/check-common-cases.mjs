@@ -310,6 +310,10 @@ const cases = [
     ['head1', 'Red, crusty'], ['eye1', 'crusty discharge'],
     ['fever', 'No fever'], ['dur', '1–3 days'], ['sev', 'Mild']
   ]],
+  ['painful eye with worse vision', 'acute_eye', 1, ['Head, ear'], [
+    ['head1', 'Red, crusty'], ['eye1', 'painful, vision is worse'],
+    ['fever', 'No fever'], ['dur', 'Less than 24 hours'], ['sev', 'Severe —']
+  ]],
   ['itchy eyes with sneezing', 'allergic_rhinitis', 1, ['Head, ear'], [
     ['head1', 'Red, crusty'], ['eye1', 'sneezing'],
     ['fever', 'No fever'], ['dur', 'Months to years'], ['sev', 'Mild']

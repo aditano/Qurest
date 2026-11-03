@@ -1,0 +1,19 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Common-case interview checks
+        run: node scripts/check-common-cases.mjs
+      - name: Triage safety regressions
+        run: node scripts/check-safety-cases.mjs

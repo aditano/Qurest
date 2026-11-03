@@ -319,7 +319,7 @@
 </head>
 <body>
 
-<a class="skip" href="#app">Skip to the question</a>
+<a class="skip" href="#app">Skip to main content</a>
 <div class="spine" aria-hidden="true"></div>
 
 <header class="masthead">
@@ -333,7 +333,7 @@
 
 <div class="container">
   <p class="preface"><span>Note.</span> Your answers stay in this browser. Qurest cannot diagnose you. If this might be an emergency, call 911.</p>
-  <div id="app"></div>
+  <div id="app" tabindex="-1"></div>
 </div>
 <footer class="colophon">Printed-form interview · nothing is saved or sent · call 911 for a real emergency</footer>
 
@@ -388,6 +388,7 @@ const CONDITIONS = {
   hypothyroidism:{name:"Hypothyroidism",cat:"Endocrine / Thyroid",desc:"A condition where the thyroid gland does not produce enough thyroid hormone, often causing slow metabolism and chronic fatigue.",symptoms:["Persistent fatigue and low energy","Weight gain or difficulty losing weight","Cold intolerance","Dry skin or hair changes","Constipation","Puffy face or swelling","Slowed thinking or depressed mood"],treatments:["Blood tests such as TSH and free T4 to confirm the diagnosis","Daily thyroid hormone replacement (levothyroxine) if diagnosed","Regular lab monitoring to adjust the dose","Address contributing factors such as iodine deficiency or autoimmune thyroid disease","Follow-up with primary care or endocrinology"],urgency:"low",urgencyNote:"Usually not an emergency, but it should be evaluated with blood tests. See a doctor if symptoms are persistent or worsening, especially if combined with swelling, hoarseness, or significant fatigue."},
   ear_infection:{name:"Ear infection",cat:"Ear / ENT",desc:"Pain and fullness in the ear, either in the middle ear after a cold or in the ear canal after water exposure. A clinician has to look in the ear to tell which it is.",symptoms:["Ear pain or a blocked, full feeling","Muffled hearing on that side","Fever, especially in children after a cold","Drainage from the ear","Pain when the outer ear is tugged (more typical of the ear canal)","Recent cold, allergies, or swimming"],treatments:["Pain relief such as acetaminophen or ibuprofen, if those are safe for you","Have a clinician look in the ear before starting antibiotics","Antibiotic ear drops are sometimes used for an outer-ear infection","Keep a swimmer's ear dry while it heals","Warm compress held over the ear for comfort"],urgency:"mod",urgencyNote:"Get the ear examined if pain, fever, drainage, or hearing loss is new. Go urgently for swelling behind the ear, a stiff neck, severe headache, confusion, or dizziness with vomiting."},
   conjunctivitis:{name:"Pink eye (conjunctivitis)",cat:"Eye",desc:"Inflammation of the thin lining of the eyelid and the white of the eye. Viruses, bacteria, and allergies are the usual causes, and the eye looks pink.",symptoms:["Pink or red eye","Watery, sticky, or crusty discharge","Lashes stuck together after sleep","Itching, mostly when allergies are the cause","Often starts in one eye and may spread to the other","Vision stays basically normal"],treatments:["Wash hands often and don't share towels or pillowcases","Cool compress and preservative-free artificial tears for comfort","Antihistamine eye drops if the eyes are itchy and you also have hay fever","Antibiotic drops only if a clinician decides the cause is bacterial","Throw away mascara and replace contact lenses used during the infection"],urgency:"low",urgencyNote:"Get same-day care if vision drops, light hurts the eye, the eye is very painful, you wear contacts, or a newborn has a red eye. Simple pink eye without those features can often wait for a routine visit."},
+  acute_eye:{name:"Painful eye with vision change",cat:"Eye / Urgent",desc:"Eye pain with worse vision or light sensitivity can signal serious problems such as acute angle-closure glaucoma, uveitis, keratitis, or another sight-threatening cause. This interview cannot tell them apart.",symptoms:["Eye pain that is more than mild irritation","Vision that is worse than usual","Pain with bright light","Red eye with these warning features","Sometimes headache, nausea, or a cloudy-looking cornea"],treatments:["Seek same-day emergency or urgent eye care — do not wait for a routine visit","Do not put leftover eye drops, steroids, or anesthetic drops in the eye unless a clinician told you to","Bring a list of contact-lens use and any chemicals or trauma involved","A clinician may need an eye-pressure check and a slit-lamp exam"],urgency:"high",urgencyNote:"Get emergency or same-day eye care now. Painful vision loss and severe light sensitivity are red-flag eye symptoms."},
   chest_wall:{name:"Chest wall pain",cat:"Chest / Musculoskeletal",desc:"Soreness in the chest wall, often where a rib meets the breastbone. The spot hurts when pressed, twisted, or during a deep breath. It is a common cause of chest pain that is not a heart attack.",symptoms:["A tender spot you can find with a finger","Pain worse with twisting, reaching, coughing, or a deep breath","Pain that stays in one small area","Often follows a strain, a bout of coughing, or an awkward posture","Not a crushing pressure that comes on with walking"],treatments:["Ease the movement that stirs it up for a few days","A warm compress or ice, whichever feels better","Acetaminophen or an anti-inflammatory if those are safe for you","Most cases settle over days to a couple of weeks","Get examined if it is not improving or you are unsure"],urgency:"low",urgencyNote:"Call 911 for crushing chest pain, pain into the arm or jaw, sweating, fainting, or shortness of breath. The opening question of this interview is there to catch that pattern. If you are unsure whether chest pain is muscular, get checked in person."}
   };
 
@@ -446,7 +447,7 @@ const QUESTIONS = {
     opts:[
       {t:"Pink eye with sticky or crusty discharge",icon:"👁️",next:"fever",s:{conjunctivitis:16}},
       {t:"Itchy, watery eyes along with sneezing or a runny nose",icon:"🌼",next:"fever",s:{allergic_rhinitis:14,conjunctivitis:3}},
-      {t:"The eye is painful, vision is worse, or light hurts",icon:"💡",next:"fever",s:{conjunctivitis:6}},
+      {t:"The eye is painful, vision is worse, or light hurts",icon:"💡",next:"fever",s:{acute_eye:20,conjunctivitis:2}},
       {t:"Gritty or dry, without much redness or goo",icon:"😐",next:"fever",s:{conjunctivitis:2,allergic_rhinitis:2}}
     ]
   },
@@ -562,7 +563,8 @@ const QUESTIONS = {
       {t:"Hard stools, straining, or fewer than 3 bowel movements a week",icon:"🧱",next:"fever",s:{constipation:12,ibs:3}},
       {t:"Pain or nausea tends to flare after heavy or fatty meals",icon:"🍟",next:"fever",s:{gallstones:10,gerd:2}},
       {t:"Loose stools, vomiting, or sick contacts are the main pattern",icon:"💦",next:"fever",s:{gastroenteritis:6}},
-      {t:"Burning, reflux, or upper stomach pain is the main pattern",icon:"🔥",next:"fever",s:{gerd:5,peptic_ulcer:5}}
+      {t:"Burning, reflux, or upper stomach pain is the main pattern",icon:"🔥",next:"fever",s:{gerd:5,peptic_ulcer:5}},
+      {t:"Pain is the main problem — bowel habits are not what worries me",icon:"⚠️",next:"fever",s:{appendicitis:12,peptic_ulcer:2,gallstones:2}}
     ]
   },
   // URINARY
@@ -777,13 +779,16 @@ const QUESTIONS = {
 // ═══════════════════════════════════════════════════
 const SHARED_FLOW = new Set(['fever','dur','sev','RESULTS']);
 const SHARED_FLOW_ORDER = {fever:0,dur:1,sev:2,RESULTS:3};
+const URGENCY_RANK = {low:0,mod:1,high:2,emergency:3};
 
 let state = {
   screen: 'quiz',
   history: [],
   scores: {},
   sectionQueue: [],
-  sharedNext: null
+  sharedNext: null,
+  peakUrgency: 'low',
+  redFlagOptIdx: null
 };
 
 let pendingOpt = null;
@@ -795,8 +800,38 @@ function resetState(){
   for(const key of Object.keys(state.scores)) delete state.scores[key];
   state.sectionQueue.length = 0;
   state.sharedNext = null;
+  state.peakUrgency = 'low';
+  state.redFlagOptIdx = null;
   pendingOpt = null;
   pendingOpts = [];
+}
+
+function escalatePeakUrgency(level){
+  if(!Object.prototype.hasOwnProperty.call(URGENCY_RANK, level)) return;
+  if(URGENCY_RANK[level] > URGENCY_RANK[state.peakUrgency]){
+    state.peakUrgency = level;
+  }
+}
+
+function displayUrgencyFor(conditionUrgency){
+  const base = Object.prototype.hasOwnProperty.call(URGENCY_RANK, conditionUrgency) ? conditionUrgency : 'low';
+  let peak = state.peakUrgency;
+  if(peak === 'emergency') peak = 'high';
+  return URGENCY_RANK[peak] > URGENCY_RANK[base] ? peak : base;
+}
+
+function hasHighUrgencySignal(){
+  if(state.peakUrgency === 'high' || state.peakUrgency === 'emergency') return true;
+  return Object.entries(state.scores).some(([id, value])=>{
+    return value > 0 && CONDITIONS[id] && CONDITIONS[id].urgency === 'high';
+  });
+}
+
+function noteUrgencyFromScores(scoreMap){
+  for(const id of Object.keys(scoreMap)){
+    const urgency = CONDITIONS[id]?.urgency;
+    if(urgency) escalatePeakUrgency(urgency);
+  }
 }
 
 function addScores(s){
@@ -887,11 +922,32 @@ function escapeHtml(value){
 }
 
 function getRankedMatches(limit=3){
-  return Object.entries(state.scores)
+  const all = Object.entries(state.scores)
     .filter(([key,value])=>CONDITIONS[key] && value>0)
     .sort(([,a],[,b])=>b-a)
-    .slice(0,limit)
     .map(([id,score])=>({id,score,condition:CONDITIONS[id]}));
+
+  if(all.length <= limit) return all;
+
+  const chosen = all.slice(0, limit);
+  const chosenIds = new Set(chosen.map(item => item.id));
+  const missingHigh = all.filter(item => item.condition.urgency === 'high' && !chosenIds.has(item.id));
+
+  for(const urgent of missingHigh){
+    let replaceAt = -1;
+    for(let i = chosen.length - 1; i >= 0; i--){
+      if(chosen[i].condition.urgency !== 'high'){
+        replaceAt = i;
+        break;
+      }
+    }
+    if(replaceAt < 0) break;
+    chosenIds.delete(chosen[replaceAt].id);
+    chosen[replaceAt] = urgent;
+    chosenIds.add(urgent.id);
+  }
+
+  return chosen.sort((a, b) => b.score - a.score);
 }
 
 function getHistoryOptionTexts(entry){
@@ -928,8 +984,8 @@ function renderClinicalSidebar(pct,caption,showOnMobile){
   return `
   <aside class="clinical-sidebar${mobileClass}">
     <section class="sidebar-block">
-      <div class="side-label">Where you are</div>
-      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <div class="side-label" id="side-progress-label">Where you are</div>
+      <div class="progress-bar" role="progressbar" aria-labelledby="side-progress-label" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}"><div class="progress-fill" style="width:${pct}%"></div></div>
       <p class="progress-caption">${escapeHtml(caption)}</p>
     </section>
     <section class="sidebar-block">
@@ -969,7 +1025,7 @@ function renderQuiz(){
       <h2 class="console-title">${escapeHtml(q.text)}</h2>
       ${q.sub?`<p class="console-copy">${escapeHtml(q.sub)}</p>`:''}
       <div class="progress-chip">
-        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <div class="progress-bar" role="progressbar" aria-label="Interview progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}"><div class="progress-fill" style="width:${pct}%"></div></div>
       </div>
     </div>
     <div class="choice-grid" id="opts">
@@ -1049,11 +1105,24 @@ function advance(){
     scores[k] = v;
   }
   addScores(scores);
+  noteUrgencyFromScores(scores);
 
   let naturalNext = q.opts[selected[0]]?.next || 'RESULTS';
   let next = naturalNext;
 
   if(naturalNext === 'EMERGENCY'){
+    escalatePeakUrgency('emergency');
+    state.redFlagOptIdx = selected[0];
+    state.history.push({
+      qid,
+      optIdx:selected[0],
+      optIdxs:selected,
+      next:'EMERGENCY',
+      naturalNext:'EMERGENCY',
+      scores,
+      beforeQueue,
+      beforeSharedNext
+    });
     state.screen = 'emergency';
     pendingOpt = null;
     pendingOpts = [];
@@ -1113,7 +1182,7 @@ function renderEmergency(){
   return `
   <div class="workspace">
     <main class="console">
-      <div class="emergency-screen">
+      <div class="emergency-screen" role="alert">
         <h2>This needs a person, not a form.</h2>
         <p>You marked a warning sign. Call <strong>911</strong> or go to the nearest emergency department. Do not wait on this interview.</p>
         <div class="emergency-actions">
@@ -1127,13 +1196,19 @@ function renderEmergency(){
 }
 
 function continueAnyway(){
+  escalatePeakUrgency('emergency');
+  const optIdx = Number.isInteger(state.redFlagOptIdx)
+    ? state.redFlagOptIdx
+    : (state.history[0]?.optIdx ?? 0);
+  state.redFlagOptIdx = optIdx;
   state.screen = 'quiz';
+  // Keep the real red-flag answer. Never rewrite it to "None of these".
   state.history = [{
     qid:'redflag',
-    optIdx:3,
-    optIdxs:[3],
+    optIdx,
+    optIdxs:[optIdx],
     next:'start',
-    naturalNext:'start',
+    naturalNext:'EMERGENCY',
     scores:{},
     beforeQueue:[],
     beforeSharedNext:null
@@ -1149,12 +1224,9 @@ function getAnalysisSummary(){
 }
 
 function renderResultsContent(){
-  const ranked = Object.entries(state.scores)
-    .filter(([,v])=>v>0)
-    .sort(([,a],[,b])=>b-a)
-    .slice(0,3);
+  const matches = getRankedMatches(3);
 
-  if(ranked.length===0){
+  if(matches.length===0){
     return `<div class="analysis-summary">
       <h3>No clear overlap</h3>
       <p>Nothing in the list lined up with what you described. A clinician can sort that out. This page cannot.</p>
@@ -1162,8 +1234,8 @@ function renderResultsContent(){
     </div>`;
   }
 
-  const maxScore = ranked[0][1];
-  const hasEmergency = ranked.some(([k])=>CONDITIONS[k]&&CONDITIONS[k].urgency==='high');
+  const maxScore = matches[0].score;
+  const hasEmergency = hasHighUrgencySignal();
   const summary = getAnalysisSummary();
   const ranks = ['Closest fit','Next','Also in the mix'];
   const rankClasses = ['r1','r2','r3'];
@@ -1175,16 +1247,22 @@ function renderResultsContent(){
   </div>`;
 
   if(hasEmergency){
-    html += `<div class="emergency-banner">One of these can be an emergency. If the symptoms are severe, get care now instead of reading on.</div>`;
+    const redFlagNote = state.peakUrgency === 'emergency'
+      ? ' You marked an emergency warning sign earlier in this interview.'
+      : '';
+    html += `<div class="emergency-banner" role="alert">One of these can be an emergency.${redFlagNote} If the symptoms are severe, get care now instead of reading on.</div>`;
   }
 
-  ranked.forEach(([cid, score], idx)=>{
-    const c = CONDITIONS[cid];
+  matches.forEach((item, idx)=>{
+    const cid = item.id;
+    const score = item.score;
+    const c = item.condition || CONDITIONS[cid];
     if(!c) return;
     const pct = Math.round((score/maxScore)*100);
     const barClass = pct>=70?'mhigh':pct>=40?'mmed':'mlow';
-    const urgClass = c.urgency==='high'?'u-high':c.urgency==='mod'?'u-mod':'u-low';
-    const urgLabel = c.urgency==='high'?'Get care soon':c.urgency==='mod'?'See a doctor':'Usually not urgent';
+    const shownUrgency = displayUrgencyFor(c.urgency);
+    const urgClass = shownUrgency==='high'?'u-high':shownUrgency==='mod'?'u-mod':'u-low';
+    const urgLabel = shownUrgency==='high'?'Get care soon':shownUrgency==='mod'?'See a doctor':'Usually not urgent';
     const confidence = pct>=75?'Strongest overlap here':pct>=45?'Partial overlap':'Weaker overlap';
 
     html += `
@@ -1203,19 +1281,19 @@ function renderResultsContent(){
       <div class="match-bar-wrap"><div class="match-bar-fill ${barClass}" style="width:${pct}%"></div></div>
       <div class="res-desc">${escapeHtml(c.desc)}</div>
 
-      <div class="sec-label" onclick="toggleSection('sym${idx}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleSection('sym${idx}')}" tabindex="0" role="button" aria-expanded="false" id="lbl-sym${idx}">
-        <svg width="8" height="12" viewBox="0 0 8 12"><path d="M1 1l6 5-6 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      <div class="sec-label" onclick="toggleSection('sym${idx}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleSection('sym${idx}')}" tabindex="0" role="button" aria-expanded="false" aria-controls="sym${idx}" id="lbl-sym${idx}">
+        <svg width="8" height="12" viewBox="0 0 8 12" aria-hidden="true"><path d="M1 1l6 5-6 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
         Common symptoms, ${c.symptoms.length}
       </div>
-      <div class="list-panel" id="sym${idx}">
+      <div class="list-panel" id="sym${idx}" role="region" aria-labelledby="lbl-sym${idx}">
         <div class="list">${c.symptoms.map(s=>`<div class="list-item sym">${escapeHtml(s)}</div>`).join('')}</div>
       </div>
 
-      <div class="sec-label" onclick="toggleSection('trt${idx}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleSection('trt${idx}')}" tabindex="0" role="button" aria-expanded="false" id="lbl-trt${idx}">
-        <svg width="8" height="12" viewBox="0 0 8 12"><path d="M1 1l6 5-6 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      <div class="sec-label" onclick="toggleSection('trt${idx}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleSection('trt${idx}')}" tabindex="0" role="button" aria-expanded="false" aria-controls="trt${idx}" id="lbl-trt${idx}">
+        <svg width="8" height="12" viewBox="0 0 8 12" aria-hidden="true"><path d="M1 1l6 5-6 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
         Care options, ${c.treatments.length}
       </div>
-      <div class="list-panel" id="trt${idx}">
+      <div class="list-panel" id="trt${idx}" role="region" aria-labelledby="lbl-trt${idx}">
         <div class="list">${c.treatments.map(t=>`<div class="list-item trt">${escapeHtml(t)}</div>`).join('')}</div>
       </div>
 
